@@ -57,7 +57,7 @@ const SUPABASE_PUBLISHABLE_KEY='sb_publishable_oOEQwdiNQr9lwdan7et1sQ_FmHpa9ps';
 // IMPORTANT: intentionally NOT named `supabase`.
 const dbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-let session=null, students=[], activities=[], registrations=[], attendance=[], users=[], benefits=[], academicYears=[], activeAcademicYear=null, criteria={faculties:[],majors:[],types:[],years:[],specific:[]}; let chart=null;
+let session=null, students=[], activities=[], registrations=[], attendance=[], users=[], benefits=[], studentBanNotices=[], academicYears=[], activeAcademicYear=null, criteria={faculties:[],majors:[],types:[],years:[],specific:[]}; let chart=null;
 const faculties=['ครุศาสตร์','มนุษยศาสตร์และสังคมศาสตร์','วิทยาศาสตร์และเทคโนโลยี','วิทยาการจัดการ'];
 const studentTypes=['นักศึกษาทั่วไป','นักศึกษาทุนเครือข่าย-คนละครึ่ง','นักศึกษา กยศ.'];
 // ปีการศึกษาไทย: มิ.ย.-ธ.ค. ใช้ปี พ.ศ. ปัจจุบัน, ม.ค.-พ.ค. ยังเป็นปีการศึกษาก่อนหน้า
@@ -80,7 +80,7 @@ async function syncMyAcademicYear(){
 }
 
 const majors=['การศึกษาพิเศษและการสอนภาษาไทย (4 ปี)','การศึกษา (วิชาเอกคณิตศาสตร์)','การศึกษา (วิชาเอกวิทยาศาสตร์)','การศึกษา (วิชาเอกสังคมศึกษา)','การศึกษา (วิชาเอกการศึกษาปฐมวัย)','การศึกษา (วิชาเอกคอมพิวเตอร์ศึกษา)','การศึกษา (วิชาเอกพลศึกษา)','การศึกษา (วิชาเอกการสอนภาษาไทย)','การศึกษา (วิชาเอกการสอนภาษาอังกฤษ)','การศึกษา (วิชาเอกการประถมศึกษา)','ภาษาอังกฤษ','รัฐประศาสนศาสตร์','ภาษาไทย','ภาษาญี่ปุ่น','การปกครองท้องถิ่น','นิติศาสตร์','ประวัติศาสตร์','ภาษาจีน','การพัฒนาชุมชนและสังคม','นิเทศศาสตร์ดิจิทัล','นาฏศิลป์ศึกษา (4 ปี)','ศิลปศึกษา (4 ปี)','ดนตรีศึกษา','สหวิทยาการเพื่อการจัดการฮาลาล','เคมี','วิทยาการคอมพิวเตอร์','เทคโนโลยีสารสนเทศ','อาชีวอนามัยและความปลอดภัย','คหกรรมศาสตร์','สาธารณสุขศาสตร์','วิทยาศาสตร์และการจัดการเทคโนโลยีอาหาร','วิทยาศาสตร์ศึกษา (4 ปี) (แขนงวิชาฟิสิกส์)','เทคโนโลยีการเกษตรสมัยใหม่','เทคโนโลยีสิ่งแวดล้อม','เทคโนโลยีอุตสาหกรรม (ต่อเนื่อง) (วิชาเอกเทคโนโลยีระบบควบคุมการผลิตอัตโนมัติ)','วิศวกรรมปัญญาประดิษฐ์ (ต่อเนื่อง)','การจัดการธุรกิจการค้าสมัยใหม่','การท่องเที่ยวและบริการ (แขนงวิชาการท่องเที่ยว)','บริหารธุรกิจ (วิชาเอกการจัดการ)','บริหารธุรกิจ (วิชาเอกการจัดการโลจิสติกส์และซัพพลายเชน)','บริหารธุรกิจ (วิชาเอกคอมพิวเตอร์ธุรกิจดิจิทัล)','บริหารธุรกิจ (วิชาเอกการตลาดดิจิทัลและอิเวนต์)','การจัดการรัฐกิจและการปกครองท้องถิ่น','เกษตรศาสตร์','วิศวกรรมไฟฟ้า','จุลชีววิทยา','เทคโนโลยีอุตสาหกรรม (ต่อเนื่อง) (วิชาเอกการจัดการเทคโนโลยีอุตสาหกรรม)','การบัญชี','การจัดการ','คอมพิวเตอร์ธุรกิจ','การท่องเที่ยว','การจัดการโลจิสติกส์และซัพพลายเชน','การตลาด (แขนงวิชาดิจิทัลมาร์เกตติง)','ดนตรีสร้างสรรค์','วิศวกรรมการจัดการ','คณิตศาสตร์ประยุกต์','วิทยาศาสตร์ศึกษา (4 ปี) (แขนงวิชาชีววิทยา)','เทคโนโลยีอุตสาหกรรม (ต่อเนื่อง)','การบริหารทรัพยากรมนุษย์','การตลาด (แขนงวิชาอิเวนต์มาร์เกตติง)','คณิตศาสตร์ (4 ปี)','วิทยาศาสตร์ (4 ปี)','สังคมศึกษา (4 ปี)','การศึกษาปฐมวัย (4 ปี)','คอมพิวเตอร์ศึกษา (4 ปี)','พลศึกษา (4 ปี)','การสอนภาษาไทย (4 ปี)','การสอนภาษาอังกฤษ (4 ปี)','การประถมศึกษา (4 ปี)','สหวิทยาการอิสลามเพื่อการพัฒนา','ดนตรีศึกษา (4 ปี)','การสอนภาษาจีน (4ปี)','วิทยาศาสตร์สิ่งแวดล้อม','ศิลปะการแสดง','ดนตรีสากล','ประยุกต์ศิลป์','วิทยาศาสตร์และเทคโนโลยีการอาหาร'];
-const benefitOptions=['เบี้ยเลี้ยง','Passcode มหาวิทยาลัย','ชั่วโมงกิจกรรมนักศึกษาทุน','ชั่วโมงจิตอาสา กยศ.'];
+const benefitOptions=['เบี้ยเลี้ยง','Passcode มหาวิทยาลัย','ชั่วโมงกิจกรรมนักศึกษาทุน','ชั่วโมงจิตอาสา กยศ.','Check-in กิจกรรมนักศึกษา (รหัส 69 เป็นต้นไป)'];
 const menuAdmin=[['dashboard','layout-dashboard','แดชบอร์ด'],['activities','calendar-days','กิจกรรม'],['students','graduation-cap','นักศึกษา'],['registrations','clipboard-list','การลงทะเบียน'],['attendance','user-check','เช็กชื่อ'],['reports','bar-chart-3','รายงาน'],['users','users','ผู้ใช้งาน'],['academicyears','calendar-range','ปีการศึกษา'],['loginlogs','log-in','Log การเข้าสู่ระบบ'],['registrationlogs','clipboard-check','Log การลงทะเบียนกิจกรรม'],['profile','user-cog','ข้อมูลส่วนตัว']];
 const menuStudent=[['dashboard','layout-dashboard','หน้าหลัก'],['activities','calendar-days','กิจกรรม'],['myactivities','ticket-check','กิจกรรมของฉัน'],['profile','user','ข้อมูลของฉัน']];
 const menuStaff=[['staffdashboard','layout-dashboard','ภาพรวม'],['staffactivities','calendar-check-2','กิจกรรม'],['staffcheckin','user-check','เช็กชื่อ'],['profile','user-cog','ข้อมูลส่วนตัว']];
@@ -193,7 +193,7 @@ async function loadAll(){
       let r=await Promise.all(req);
       [students,activities,registrations,attendance,benefits,criteria.faculties,criteria.majors,criteria.types,criteria.years,criteria.specific,users,systemLogs]=r;
     }else if(isStaff()){
-      students=[];registrations=[];attendance=[];benefits=[];users=[];
+      students=[];registrations=[];attendance=[];benefits=[];users=[];studentBanNotices=[];
       criteria={faculties:[],majors:[],types:[],years:[],specific:[]};
       activities=await safe(dbClient.rpc('get_staff_activities',{p_staff_user_id:session.id}));
     }else{
@@ -208,13 +208,14 @@ async function loadAll(){
       if(own[0]){
         session.student_id=own[0].id;
         session.full_name=own[0].full_name||session.full_name;
-        sessionStorage.setItem('activity_session',JSON.stringify(session));
+        localStorage.setItem('activity_session',JSON.stringify(session));
       }
       const sid=own[0]?.id||session?.student_id;
       const req=[
         safe(dbClient.from('activities').select('*').order('activity_date',{ascending:false})),
         sid?safe(dbClient.from('activity_registrations').select('*').eq('student_id',sid)):Promise.resolve([]),
         sid?safe(dbClient.from('activity_attendance').select('*').eq('student_id',sid)):Promise.resolve([]),
+        sid?safe(dbClient.rpc('get_student_ban_notices',{p_student_id:sid})):Promise.resolve([]),
         safe(dbClient.from('activity_benefits').select('*')),
         safe(dbClient.from('activity_faculties').select('*')),
         safe(dbClient.from('activity_majors').select('*')),
@@ -223,7 +224,7 @@ async function loadAll(){
         safe(dbClient.from('activity_specific_students').select('*'))
       ];
       let r=await Promise.all(req);
-      [activities,registrations,attendance,benefits,criteria.faculties,criteria.majors,criteria.types,criteria.years,criteria.specific]=r;
+      [activities,registrations,attendance,studentBanNotices,benefits,criteria.faculties,criteria.majors,criteria.types,criteria.years,criteria.specific]=r;
       users=[];
     }
   }catch(e){toast(e.message,'err')}finally{loading(false)}
@@ -233,7 +234,7 @@ function buildNav(){let menus=isAdmin()?menuAdmin:(isStaff()?menuStaff:menuStude
 function toggleAdminPanel(force){$('#adminPanel').classList.toggle('hide',force===undefined?!$('#adminPanel').classList.contains('hide'):!force);refreshIcons()}
 async function go(page){$$('.navbtn').forEach(x=>x.classList.toggle('nav-active',x.dataset.page===page));let titles={dashboard:'แดชบอร์ด',activities:'กิจกรรม',students:'จัดการนักศึกษา',registrations:'การลงทะเบียน',attendance:'เช็กชื่อ',reports:'รายงาน',users:'จัดการผู้ใช้งาน',profile:'ข้อมูลส่วนตัว',myactivities:'กิจกรรมของฉัน',academicyears:'ปีการศึกษา',loginlogs:'Log การเข้าสู่ระบบ',registrationlogs:'Log การลงทะเบียนกิจกรรม',staffdashboard:'ภาพรวม Staff',staffactivities:'กิจกรรมของคณะ',staffcheckin:'เช็กชื่อนักศึกษา'};$('#pageTitle').textContent=titles[page]||'';let fn={dashboard:renderDashboard,activities:renderActivities,students:renderStudents,registrations:renderRegistrations,attendance:renderAttendance,reports:renderReports,users:renderUsers,profile:renderProfile,myactivities:renderMyActivities,academicyears:renderAcademicYears,loginlogs:renderLoginLogs,registrationlogs:renderRegistrationLogs,staffdashboard:renderStaffDashboard,staffactivities:renderStaffActivities,staffcheckin:renderStaffCheckin}[page];if(fn)await fn();refreshIcons();window.scrollTo(0,0)}
 $('#togglePassword').onclick=()=>{let p=$('#loginPassword');p.type=p.type==='password'?'text':'password'};
-$('#loginForm').onsubmit=async e=>{e.preventDefault();loading(true,'กำลังเข้าสู่ระบบ...');try{let data=await safe(dbClient.rpc('custom_login',{p_username:$('#loginUsername').value,p_password:$('#loginPassword').value}));if(!data?.length)throw new Error('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');session=data[0];sessionStorage.setItem('activity_session',JSON.stringify(session));if($('#rememberMe').checked)localStorage.setItem('remember_username',$('#loginUsername').value);else localStorage.removeItem('remember_username');if(session.role==='student'&&session.force_password_change){showFirstLoginPassword()}else{await enterApp()}}catch(err){toast(err.message,'err')}finally{loading(false)}};
+$('#loginForm').onsubmit=async e=>{e.preventDefault();loading(true,'กำลังเข้าสู่ระบบ...');try{let data=await safe(dbClient.rpc('custom_login',{p_username:$('#loginUsername').value,p_password:$('#loginPassword').value}));if(!data?.length)throw new Error('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');session=data[0];localStorage.setItem('activity_session',JSON.stringify(session));if($('#rememberMe').checked)localStorage.setItem('remember_username',$('#loginUsername').value);else localStorage.removeItem('remember_username');if(session.role==='student'&&session.force_password_change){showFirstLoginPassword()}else{await enterApp()}}catch(err){toast(err.message,'err')}finally{loading(false)}};
 
 function showFirstLoginPassword(){
   modal(`<form onsubmit="completeFirstLogin(event)" class="max-w-xl mx-auto">
@@ -275,7 +276,7 @@ async function completeFirstLogin(e){
   try{
     await safe(dbClient.rpc('complete_first_login',{p_user_id:session.id,p_new_password:pw}));
     session.force_password_change=false;
-    sessionStorage.setItem('activity_session',JSON.stringify(session));
+    localStorage.setItem('activity_session',JSON.stringify(session));
     closeModal();
     await enterApp();
     toast('ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว');
@@ -284,7 +285,7 @@ async function completeFirstLogin(e){
 
 async function enterApp(){$('#loginView').classList.add('hide');$('#appView').classList.remove('hide');$('#headerName').textContent=session.full_name;$('#headerRole').textContent=session.role==='admin'?'ผู้ดูแลระบบ':'นักศึกษา';buildNav();await loadAll();await syncMyAcademicYear();go('dashboard')}
 function askLogout(){modal(`<div class="text-center"><div class="mx-auto w-14 h-14 rounded-full bg-blue-100 text-blue-700 grid place-items-center">${icon('log-out')}</div><h3 class="text-xl font-semibold mt-4">ออกจากระบบ?</h3><p class="text-slate-500 mt-2">คุณต้องการออกจากระบบใช่หรือไม่</p><div class="flex gap-3 mt-6"><button onclick="closeModal()" class="btn bg-slate-100 flex-1">ยกเลิก</button><button onclick="logout()" class="btn btn-primary flex-1">ออกจากระบบ</button></div></div>`)}
-function logout(){sessionStorage.removeItem('activity_session');session=null;closeModal();$('#appView').classList.add('hide');$('#loginView').classList.remove('hide');$('#loginPassword').value='';refreshIcons()}
+function logout(){localStorage.removeItem('activity_session');session=null;closeModal();$('#appView').classList.add('hide');$('#loginView').classList.remove('hide');$('#loginPassword').value='';refreshIcons()}
 function regCount(id){return registrations.filter(r=>r.activity_id===id&&r.registration_status==='registered').length} function myReg(id){return registrations.find(r=>r.activity_id===id&&r.student_id===currentStudentId()&&r.registration_status==='registered')}
 function eligibility(a,s){
   if(!s||!a||a.is_visible===false)return false;
@@ -294,7 +295,7 @@ function eligibility(a,s){
   let facultyOK=!f.length||f.some(x=>['ทุกคณะ','ทั้งหมด','all'].includes(norm(x.faculty).toLowerCase())||norm(x.faculty)===norm(s.faculty));
   let majorOK=!m.length||m.some(x=>['ทุกสาขา','ทั้งหมด','all'].includes(norm(x.major).toLowerCase())||norm(x.major)===norm(s.major));
   let typeOK=!t.length||t.some(x=>['ทุกประเภท','ทั้งหมด','all'].includes(norm(x.student_type).toLowerCase())||norm(x.student_type)===norm(s.student_type));
-  let yearOK=!y.length||y.some(x=>['0','ทุกชั้นปี','ทุกปี','ทั้งหมด','all'].includes(norm(x.year_level).toLowerCase())||norm(x.year_level)===norm(s.year_level));
+  let yearOK=!y.length||y.some(x=>['0','ทุกชั้นปี','ทุกปี','ทั้งหมด','all'].includes(norm(x.year_level).toLowerCase())||norm(x.year_level)===norm(s.year_level)||(norm(x.year_level)==='4'&&norm(s.year_level).startsWith('ค้างรุ่น')));
   return facultyOK&&majorOK&&typeOK&&yearOK;
 }
 function visibleActivitiesForCurrentUser(){return isAdmin()?activities:activities.filter(a=>Number(a.academic_year||currentAcademicYear())===Number(currentAcademicYear())&&eligibility(a,studentSelf()))}
@@ -313,6 +314,7 @@ function normalizeAttendanceStatus(v){
   let s=String(v||'').trim();
   if(['มา','present'].includes(s))return 'present';
   if(['สาย','late'].includes(s))return 'late';
+  if(['ลา','leave'].includes(s))return 'leave';
   if(['ไม่มา','absent'].includes(s))return 'absent';
   return s;
 }
@@ -399,25 +401,41 @@ async function openStaffCheckin(activityId){
 function renderStaffCheckinList(q=''){
   let a=staffCheckinActivity,clean=String(q||'').trim().toLowerCase();
   let rows=staffCheckinRows.filter(s=>!clean||[s.student_code,s.full_name,s.major].some(v=>String(v||'').toLowerCase().includes(clean)));
-  let present=staffCheckinRows.filter(x=>x.attendance_status==='present').length,late=staffCheckinRows.filter(x=>x.attendance_status==='late').length,absent=staffCheckinRows.filter(x=>x.attendance_status==='absent').length,pending=staffCheckinRows.length-present-late-absent;
+  let present=staffCheckinRows.filter(x=>normalizeAttendanceStatus(x.attendance_status)==='present').length,late=staffCheckinRows.filter(x=>normalizeAttendanceStatus(x.attendance_status)==='late').length,absent=staffCheckinRows.filter(x=>normalizeAttendanceStatus(x.attendance_status)==='absent').length,leave=staffCheckinRows.filter(x=>normalizeAttendanceStatus(x.attendance_status)==='leave').length,pending=staffCheckinRows.length-present-late-absent-leave;
   $('#content').innerHTML=`<div class="max-w-7xl mx-auto">
     <div class="flex flex-wrap gap-3 items-start justify-between mb-4"><div><button onclick="go('staffcheckin')" class="text-sm text-blue-600 mb-2">← กลับเลือกกิจกรรม</button><h2 class="text-2xl font-semibold">${esc(a?.title||'เช็กชื่อ')}</h2><p class="text-sm text-slate-500 mt-1">${esc(a?.activity_code||'')} · ${fmtDate(a?.activity_date)} · เฉพาะคณะที่คุณรับผิดชอบ</p></div></div>
-    <div class="grid grid-cols-4 gap-2 mb-4"><div class="v3-kpi"><p class="text-xs text-slate-500">ทั้งหมด</p><p class="text-xl font-semibold">${staffCheckinRows.length}</p></div><div class="v3-kpi"><p class="text-xs text-slate-500">มา</p><p class="text-xl font-semibold text-emerald-700">${present}</p></div><div class="v3-kpi"><p class="text-xs text-slate-500">สาย</p><p class="text-xl font-semibold text-amber-700">${late}</p></div><div class="v3-kpi"><p class="text-xs text-slate-500">รอเช็ก</p><p class="text-xl font-semibold text-blue-700">${pending}</p></div></div>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4"><div class="v3-kpi"><p class="text-xs text-slate-500">ทั้งหมด</p><p class="text-xl font-semibold">${staffCheckinRows.length}</p></div><div class="v3-kpi"><p class="text-xs text-slate-500">มา</p><p class="text-xl font-semibold text-emerald-700">${present}</p></div><div class="v3-kpi"><p class="text-xs text-slate-500">สาย</p><p class="text-xl font-semibold text-amber-700">${late}</p></div><div class="v3-kpi"><p class="text-xs text-slate-500">ลา</p><p class="text-xl font-semibold text-violet-700">${leave}</p></div><div class="v3-kpi"><p class="text-xs text-slate-500">รอเช็ก</p><p class="text-xl font-semibold text-blue-700">${pending}</p></div></div>
     <div class="card p-3 mb-4"><input id="staffCheckSearch" value="${esc(q)}" oninput="renderStaffCheckinList(this.value)" class="input" placeholder="ค้นหารหัสนักศึกษา ชื่อ หรือสาขา..."></div>
     <div class="card overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50"><tr><th class="p-3 text-left">นักศึกษา</th><th class="p-3 text-left">สาขา</th><th class="p-3 text-left">สิทธิ์</th><th class="p-3 text-center">สถานะ</th><th class="p-3 text-right">เช็กชื่อ</th></tr></thead><tbody>${rows.map(s=>staffCheckinRow(s)).join('')||'<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่พบรายชื่อ</td></tr>'}</tbody></table></div>
   </div>`;refreshIcons();setTimeout(()=>{let el=$('#staffCheckSearch');if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length)}},0);
 }
 function staffCheckinRow(s){
-  let st=s.attendance_status, badge=st==='present'?'<span class="v3-chip bg-emerald-50 text-emerald-700">เข้าร่วม</span>':st==='late'?'<span class="v3-chip bg-amber-50 text-amber-700">มาสาย</span>':st==='absent'?'<span class="v3-chip bg-red-50 text-red-700">ไม่เข้าร่วม</span>':'<span class="v3-chip bg-slate-100 text-slate-600">รอเช็กชื่อ</span>';
-  return `<tr class="border-t"><td class="p-3"><b>${esc(s.student_code)}</b><div>${esc(s.full_name)}</div><small class="text-slate-500">${esc(s.faculty)} · ${esc(s.year_level)}</small></td><td class="p-3">${esc(s.major)}</td><td class="p-3 text-xs text-blue-700">${esc(s.selected_benefit||'-')}</td><td class="p-3 text-center">${badge}</td><td class="p-3"><div class="flex justify-end gap-1"><button onclick="staffSetAttendance('${s.student_id}','present')" class="btn bg-emerald-50 text-emerald-700 text-xs">มา</button><button onclick="staffSetAttendance('${s.student_id}','late')" class="btn bg-amber-50 text-amber-700 text-xs">สาย</button><button onclick="staffSetAttendance('${s.student_id}','absent')" class="btn bg-red-50 text-red-700 text-xs">ไม่มา</button></div></td></tr>`;
+  let st=normalizeAttendanceStatus(s.attendance_status), editable=attendanceEditable(staffCheckinActivity);
+  let badge=st==='present'?'<span class="v3-chip bg-emerald-50 text-emerald-700">เข้าร่วม</span>':st==='late'?'<span class="v3-chip bg-amber-50 text-amber-700">มาสาย</span>':st==='absent'?'<span class="v3-chip bg-red-50 text-red-700">ไม่เข้าร่วม</span>':st==='leave'?'<span class="v3-chip bg-violet-50 text-violet-700">ลา</span>':'<span class="v3-chip bg-slate-100 text-slate-600">รอเช็กชื่อ</span>';
+  let btn=(status,label,cls)=>`<button ${editable?'':'disabled'} onclick="${editable?`staffSetAttendance('${s.student_id}','${status}')`:''}" class="btn ${st===status?cls+' text-white':cls.replace(/600|500/g,'50')} text-xs ${editable?'':'opacity-50 cursor-not-allowed'}">${label}</button>`;
+  return `<tr class="border-t"><td class="p-3"><b>${esc(s.student_code)}</b><div>${esc(s.full_name)}</div><small class="text-slate-500">${esc(s.faculty)} · ${esc(s.year_level)}</small></td><td class="p-3">${esc(s.major)}</td><td class="p-3 text-xs text-blue-700">${esc(s.selected_benefit||'-')}</td><td class="p-3 text-center">${badge}</td><td class="p-3"><div class="flex flex-wrap justify-end gap-1">
+    ${btn('present','มา','bg-emerald-600')}${btn('late','สาย','bg-amber-500')}${btn('leave','ลา','bg-violet-600')}${btn('absent','ไม่มา','bg-red-600')}
+    <button ${editable?'':'disabled'} onclick="${editable?`staffClearAttendance('${s.student_id}')`:''}" class="btn ${!st?'bg-blue-600 text-white':'bg-white border text-slate-600'} text-xs ${editable?'':'opacity-50 cursor-not-allowed'}">ยังไม่เช็ก</button>
+  </div>${editable?'':'<div class="text-[11px] text-slate-400 text-right mt-1">${esc(attendanceEditHint(activities.find(a=>a.id===id)))}</div>'}</td></tr>`;
 }
 async function staffSetAttendance(studentId,status){
   if(!staffCheckinActivity)return;
+  if(!attendanceEditable(staffCheckinActivity))return toast('ไม่สามารถแก้ไขการเช็กชื่อได้ เนื่องจากพ้น 24 ชั่วโมงหลังสิ้นสุดกิจกรรมแล้ว','err');
   loading(true,'กำลังบันทึกการเช็กชื่อ...');
   try{
     await safe(dbClient.rpc('set_attendance',{p_activity_id:staffCheckinActivity.activity_id||staffCheckinActivity.id,p_student_id:studentId,p_status:status,p_checked_by:session.id,p_note:null}));
     let row=staffCheckinRows.find(x=>x.student_id===studentId);if(row){row.attendance_status=status;row.checked_at=new Date().toISOString();row.checked_by=session.id}
     renderStaffCheckinList($('#staffCheckSearch')?.value||'');toast('บันทึกการเช็กชื่อแล้ว');
+  }catch(e){toast(e.message,'err')}finally{loading(false)}
+}
+async function staffClearAttendance(studentId){
+  if(!staffCheckinActivity)return;
+  if(!attendanceEditable(staffCheckinActivity))return toast('ไม่สามารถแก้ไขการเช็กชื่อได้ เนื่องจากพ้น 24 ชั่วโมงหลังสิ้นสุดกิจกรรมแล้ว','err');
+  loading(true,'กำลังแก้ไขการเช็กชื่อ...');
+  try{
+    await safe(dbClient.rpc('clear_attendance',{p_activity_id:staffCheckinActivity.activity_id||staffCheckinActivity.id,p_student_id:studentId,p_cleared_by:session.id}));
+    let row=staffCheckinRows.find(x=>x.student_id===studentId);if(row){row.attendance_status=null;row.checked_at=null;row.checked_by=null}
+    renderStaffCheckinList($('#staffCheckSearch')?.value||'');toast('เปลี่ยนเป็น “ยังไม่เช็กชื่อ” แล้ว');
   }catch(e){toast(e.message,'err')}finally{loading(false)}
 }
 
@@ -428,22 +446,36 @@ function renderMyActivities(){
   let past=rows.filter(x=>(activityStartDate(x.a)||0)<now);
   let eventRow=x=>{
     let at=v3Attendance(x.a.id,currentStudentId()),[lab,cls]=v3AttendanceLabel(at),cs=cancellationState(x.a);
+    let checked=at&&['present','late','absent','leave'].includes(normalizeAttendanceStatus(at.attendance_status));
     return `<div class="v3-event p-4 md:p-5">
       <div class="flex gap-4">
-        <img src="${x.a.banner_url||''}" onerror="this.style.display='none'" class="w-24 h-24 md:w-32 md:h-24 rounded-2xl object-cover bg-blue-50 shrink-0">
+        <img src="${x.a.banner_url||x.a.banner_path||''}" onerror="this.style.display='none'" class="w-24 h-24 md:w-32 md:h-24 rounded-2xl object-cover bg-blue-50 shrink-0">
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap gap-2 mb-2"><span class="v3-chip">${esc(x.a.activity_code||'กิจกรรม')}</span><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold ${cls}">${lab}</span></div>
           <h3 class="font-semibold text-base md:text-lg leading-snug">${esc(x.a.title)}</h3>
           <p class="text-xs text-slate-500 mt-2">${fmtDate(x.a.activity_date)} · ${String(x.a.start_time||'').slice(0,5)} น. · ${esc(x.a.appointment_location||'-')}</p>
           <p class="text-xs text-blue-700 mt-2">สิทธิ์ที่เลือก: ${esc(x.r.selected_benefit||'-')}</p>
           ${at?.checked_at?`<p class="text-xs text-emerald-700 mt-1">เช็กชื่อ ${new Date(at.checked_at).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'})}</p>`:''}
-          <div class="flex gap-2 mt-3"><button onclick="viewActivity('${x.a.id}')" class="btn btn-soft text-xs flex-1">รายละเอียด</button>${!at?.attendance_status?`<button onclick="editRegisteredBenefit('${x.a.id}')" class="btn bg-white border text-xs flex-1">เปลี่ยนสิทธิ์</button>`:''}</div>
+          <div class="mt-4 space-y-2">
+            <button onclick="viewActivity('${x.a.id}')" class="btn btn-soft text-xs w-full">${icon('eye','w-4 inline')} ดูรายละเอียดกิจกรรม</button>
+            <button ${checked?'disabled':''}
+              onclick="${checked?'':`editRegisteredBenefit('${x.a.id}','myactivities')`}"
+              class="btn ${checked?'bg-slate-100 text-slate-400 cursor-not-allowed':'bg-blue-50 text-blue-700 border border-blue-100'} text-xs w-full">
+              ${icon('gift','w-4 inline')} ${checked?'แก้ไขสิทธิประโยชน์ไม่ได้ (เช็กชื่อแล้ว)':'แก้ไขสิทธิประโยชน์'}
+            </button>
+            <button ${cs.allowed?'disabled':''}
+              onclick="${cs.allowed?`cancelReg('${x.a.id}','myactivities')`:''}"
+              class="btn ${cs.allowed?'bg-red-50 text-red-600':'bg-slate-100 text-slate-400 cursor-not-allowed'} text-xs w-full">
+              ${icon('x-circle','w-4 inline')} ${cs.allowed?'ยกเลิกการลงทะเบียน':'ยกเลิกไม่ได้'}
+            </button>
+          </div>
           ${!cs.allowed&&new Date()<(activityStartDate(x.a)||0)?`<p class="text-[11px] text-slate-400 mt-2">🔒 ปิดการยกเลิกแล้ว</p>`:''}
         </div>
       </div>
     </div>`;
   };
   $('#content').innerHTML=`<div class="max-w-5xl mx-auto">
+    ${studentBanNoticeHTML()}
     <div class="mb-5"><p class="text-sm text-blue-600 font-medium">MY ACTIVITIES</p><h2 class="text-2xl font-semibold">กิจกรรมของฉัน</h2><p class="text-sm text-slate-500 mt-1">ติดตามกิจกรรม สิทธิประโยชน์ และสถานะเช็กชื่อของคุณ</p></div>
     <div class="flex gap-2 mb-5"><span class="v3-chip">กำลังจะมาถึง ${upcoming.length}</span><span class="v3-chip">เสร็จสิ้น ${past.length}</span></div>
     <section><h3 class="v3-section-title mb-3">กำลังจะมาถึง</h3><div class="grid gap-3">${upcoming.length?upcoming.map(eventRow).join(''):`<div class="v3-empty">ยังไม่มีกิจกรรมที่กำลังจะมาถึง</div>`}</div></section>
@@ -451,13 +483,37 @@ function renderMyActivities(){
   </div>`;
   refreshIcons();
 }
+
+function activeStudentBanNotices(){
+  return (studentBanNotices||[]).filter(b=>['active','no_target'].includes(b.status));
+}
+function studentBanNoticeHTML(){
+  let bans=activeStudentBanNotices();
+  if(!bans.length)return '';
+  return `<section class="mb-5 space-y-3">${bans.map(b=>`
+    <div class="rounded-2xl border border-red-200 bg-red-50 p-4 md:p-5">
+      <div class="flex gap-3 items-start">
+        <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 grid place-items-center shrink-0">${icon('shield-alert','w-5 h-5')}</div>
+        <div class="min-w-0 flex-1">
+          <div class="font-semibold text-red-800">ถูกระงับสิทธิ์การจองกิจกรรม 1 กิจกรรม</div>
+          <p class="text-sm text-red-700 mt-1">เนื่องจากคุณลงทะเบียนเข้าร่วมกิจกรรม <b>“${esc(b.source_activity_title||b.source_activity_code||'-')}”</b>${b.source_activity_date?` วันที่ ${fmtDate(b.source_activity_date)}`:''} แต่ไม่ได้เข้าร่วมกิจกรรมและไม่มีการแจ้งลาไว้</p>
+          ${b.target_activity_id
+            ? `<p class="text-sm text-red-700 mt-2">กิจกรรมที่ถูกระงับสิทธิ์การจอง: <b>“${esc(b.target_activity_title||b.target_activity_code||'-')}”</b>${b.target_activity_date?` วันที่ ${fmtDate(b.target_activity_date)}`:''}</p>`
+            : `<p class="text-sm text-amber-700 mt-2">ขณะนี้ยังไม่มีกิจกรรมถัดไปที่ตรงกับกลุ่มเป้าหมาย ระบบจะนำโทษไปใช้กับกิจกรรมแรกที่คุณมีสิทธิ์จองในอนาคต</p>`}
+          <p class="text-xs text-red-600 mt-2">หากมีเหตุสุดวิสัยและได้แจ้งเจ้าหน้าที่ไว้ กรุณาติดต่อ Admin/Staff เพื่อบันทึกสถานะ “ลา” ภายในระยะเวลาที่ระบบอนุญาต</p>
+        </div>
+      </div>
+    </div>`).join('')}</section>`;
+}
+
 function renderStudentHome(){
   let s=v3Student(); if(!s){$('#content').innerHTML=`<div class="v3-empty">ไม่พบข้อมูลนักศึกษาที่เชื่อมกับบัญชี ${esc(session?.username||'')}</div>`;return;}
-  if(session.student_id!==s.id){session.student_id=s.id;sessionStorage.setItem('activity_session',JSON.stringify(session));}
+  if(session.student_id!==s.id){session.student_id=s.id;localStorage.setItem('activity_session',JSON.stringify(session));}
   let eligible=visibleActivitiesForCurrentUser();
   let mine=v3MyActivities(),next=mine.find(x=>(activityStartDate(x.a)||0)>new Date());
   let checked=mine.filter(x=>['present','late'].includes(v3Attendance(x.a.id,s.id)?.attendance_status)).length;
   $('#content').innerHTML=`<div class="max-w-6xl mx-auto">
+    ${studentBanNoticeHTML()}
     <section class="v3-hero p-5 md:p-7">
       <div class="relative z-10 max-w-2xl"><p class="text-blue-100 text-sm">Activity ARU</p><h2 class="text-2xl md:text-3xl font-semibold mt-1">สวัสดี ${esc((s.full_name||'นักศึกษา').split(' ')[0])} 👋</h2><p class="text-blue-100 text-sm mt-2">ค้นหากิจกรรมที่ตรงกับคุณ ลงทะเบียน และติดตามสถานะได้ในที่เดียว</p>
       <div class="flex gap-2 mt-5"><button onclick="navigate('activities')" class="btn bg-white text-blue-700 px-5">ค้นหากิจกรรม</button><button onclick="renderMyActivities()" class="btn bg-white/10 border border-white/20 text-white px-5">กิจกรรมของฉัน</button></div></div>
@@ -469,16 +525,104 @@ function renderStudentHome(){
   refreshIcons();
 }
 
-function renderDashboard(){if(session?.role==='student')return renderStudentHome();
-  let allowed=visibleActivitiesForCurrentUser(),allowedIds=new Set(allowed.map(a=>a.id));
-  let mine=isAdmin()?registrations.filter(r=>r.registration_status==='registered'):registrations.filter(r=>r.student_id===currentStudentId()&&r.registration_status==='registered'&&allowedIds.has(r.activity_id));
-  let att=isAdmin()?attendance:attendance.filter(x=>x.student_id===currentStudentId()&&allowedIds.has(x.activity_id));
-  let totalActivities=isAdmin()?activities.length:allowed.length;
-  let chartRegs=isAdmin()?registrations.filter(r=>r.registration_status==='registered'):mine;
-  let chartCapacity=(isAdmin()?activities:allowed).reduce((n,a)=>n+a.capacity,0);
-  $('#content').innerHTML=`<div class="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">${statCard('กิจกรรมทั้งหมด',totalActivities,'calendar-days')}${statCard(isAdmin()?'นักศึกษาทั้งหมด':'กิจกรรมที่ลงทะเบียน',isAdmin()?students.length:mine.length,'users')}${statCard('การลงทะเบียน',mine.length,'clipboard-check')}${statCard('เข้าร่วมแล้ว',att.filter(x=>['present','late'].includes(normalizeAttendanceStatus(x.attendance_status))).length,'user-check')}</div><div class="grid xl:grid-cols-3 gap-4 mt-4"><div class="card p-5 xl:col-span-2"><h3 class="font-semibold mb-4">กิจกรรมล่าสุด</h3><div class="space-y-3">${allowed.slice(0,5).map(a=>`<div class="flex items-center justify-between gap-3 border-b last:border-0 pb-3"><div><b class="text-sm">${esc(a.title)}</b><p class="text-xs text-slate-500">${fmtDate(a.activity_date)} · ${a.start_time.slice(0,5)} น.</p></div><span class="text-xs bg-slate-100 rounded-full px-2 py-1">${regCount(a.id)}/${a.capacity}</span></div>`).join('')||'<p class="text-slate-400">ไม่มีกิจกรรมที่ตรงตามเงื่อนไขของคุณ</p>'}</div></div><div class="card p-5"><h3 class="font-semibold mb-4">สัดส่วนการลงทะเบียน</h3><canvas id="dashChart"></canvas></div></div>`;
-  setTimeout(()=>{let ctx=$('#dashChart');if(ctx){if(chart)chart.destroy();chart=new Chart(ctx,{type:'doughnut',data:{labels:['ลงทะเบียน','ที่ว่าง'],datasets:[{data:[chartRegs.length,Math.max(0,chartCapacity-chartRegs.length)]}]},options:{plugins:{legend:{position:'bottom'}}}})}},0)
+function dashboardPct(n,d){return d>0?Math.min(100,Math.max(0,(n/d)*100)):0}
+function dashboardMetric(label,value,sub='',tone='slate'){
+  const tones={blue:'bg-blue-50 text-blue-700',emerald:'bg-emerald-50 text-emerald-700',amber:'bg-amber-50 text-amber-700',violet:'bg-violet-50 text-violet-700',red:'bg-red-50 text-red-700',slate:'bg-slate-100 text-slate-700'};
+  return `<div class="rounded-2xl border border-slate-100 p-4 bg-white"><div class="flex items-start justify-between gap-2"><div><p class="text-xs text-slate-500">${label}</p><p class="text-2xl font-semibold mt-1">${Number(value||0).toLocaleString()}</p>${sub?`<p class="text-xs text-slate-400 mt-1">${sub}</p>`:''}</div><span class="w-2.5 h-2.5 rounded-full mt-1 ${tones[tone]||tones.slate}"></span></div></div>`;
 }
+function dashboardActivityStats(activityId=''){
+  const arr=activityId?activities.filter(a=>a.id===activityId):activities;
+  const ids=new Set(arr.map(a=>a.id));
+  const regs=registrations.filter(r=>r.registration_status==='registered'&&ids.has(r.activity_id));
+  const atts=attendance.filter(x=>ids.has(x.activity_id));
+  const statusCount=st=>atts.filter(x=>normalizeAttendanceStatus(x.attendance_status)===st).length;
+  const capacity=arr.reduce((n,a)=>n+Number(a.capacity||0),0);
+  const registered=regs.length;
+  const present=statusCount('present'),late=statusCount('late'),leave=statusCount('leave'),absent=statusCount('absent');
+  const checked=present+late+leave+absent;
+  return {arr,capacity,registered,available:Math.max(0,capacity-registered),present,late,leave,absent,checked};
+}
+function dashboardChart(canvasId,type,labels,data){
+  const el=document.getElementById(canvasId);if(!el)return;
+  window._aruDashCharts=window._aruDashCharts||{};
+  if(window._aruDashCharts[canvasId])window._aruDashCharts[canvasId].destroy();
+  window._aruDashCharts[canvasId]=new Chart(el,{type,data:{labels,datasets:[{data}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,padding:16}}},scales:type==='bar'?{y:{beginAtZero:true,ticks:{precision:0}},x:{grid:{display:false}}}:undefined}});
+}
+function dashboardSectionRegistration(stats,prefix,title,subtitle){
+  const pct=dashboardPct(stats.registered,stats.capacity);
+  return `<section class="card p-5 md:p-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-5"><div><p class="text-xs font-semibold tracking-wide text-blue-600">REGISTRATION</p><h3 class="text-lg font-semibold">${title}</h3><p class="text-sm text-slate-500 mt-1">${subtitle}</p></div><div class="text-right"><p class="text-2xl font-semibold text-blue-700">${pct.toFixed(1)}%</p><p class="text-xs text-slate-400">อัตราการลงทะเบียนต่อจำนวนเปิดรับ</p></div></div>
+    <div class="grid sm:grid-cols-3 gap-3">${dashboardMetric('จำนวนที่เปิดรับ',stats.capacity,'ที่นั่งรวม','blue')}${dashboardMetric('ลงทะเบียนแล้ว',stats.registered,`${pct.toFixed(1)}% ของจำนวนเปิดรับ`,'emerald')}${dashboardMetric('ที่นั่งคงเหลือ',stats.available,'ยังสามารถรองรับได้','slate')}</div>
+    <div class="mt-5 h-64"><canvas id="${prefix}RegChart"></canvas></div>
+  </section>`;
+}
+function dashboardSectionAttendance(stats,prefix,title,subtitle){
+  const regBase=stats.registered||0;
+  return `<section class="card p-5 md:p-6">
+    <div class="mb-5"><p class="text-xs font-semibold tracking-wide text-violet-600">ATTENDANCE</p><h3 class="text-lg font-semibold">${title}</h3><p class="text-sm text-slate-500 mt-1">${subtitle}</p></div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3">
+      ${dashboardMetric('เปิดรับ',stats.capacity,'คน','blue')}
+      ${dashboardMetric('ลงทะเบียน',stats.registered,`${dashboardPct(stats.registered,stats.capacity).toFixed(1)}% ของที่เปิดรับ`,'slate')}
+      ${dashboardMetric('มา',stats.present,`${dashboardPct(stats.present,regBase).toFixed(1)}% ของผู้ลงทะเบียน`,'emerald')}
+      ${dashboardMetric('สาย',stats.late,`${dashboardPct(stats.late,regBase).toFixed(1)}% ของผู้ลงทะเบียน`,'amber')}
+      ${dashboardMetric('ลา',stats.leave,`${dashboardPct(stats.leave,regBase).toFixed(1)}% ของผู้ลงทะเบียน`,'violet')}
+      ${dashboardMetric('ไม่มา',stats.absent,`${dashboardPct(stats.absent,regBase).toFixed(1)}% ของผู้ลงทะเบียน`,'red')}
+      ${dashboardMetric('เช็กชื่อแล้ว',stats.checked,`${dashboardPct(stats.checked,regBase).toFixed(1)}% ของผู้ลงทะเบียน`,'blue')}
+    </div>
+    <div class="grid lg:grid-cols-2 gap-5 mt-5">
+      <div class="rounded-2xl bg-slate-50 p-4"><p class="text-sm font-semibold mb-3">สัดส่วนสถานะการเข้าร่วม</p><div class="h-64"><canvas id="${prefix}AttChart"></canvas></div></div>
+      <div class="rounded-2xl bg-slate-50 p-4"><p class="text-sm font-semibold mb-3">เปรียบเทียบจำนวน</p><div class="h-64"><canvas id="${prefix}AttBar"></canvas></div></div>
+    </div>
+  </section>`;
+}
+function renderDashboard(){
+  if(session?.role==='student')return renderStudentHome();
+  const allowed=visibleActivitiesForCurrentUser();
+  const dashboardActivities=isAdmin()?activities:allowed;
+  const allStats=dashboardActivityStats('');
+  const sorted=[...dashboardActivities].sort((a,b)=>String(b.activity_date||'').localeCompare(String(a.activity_date||'')));
+  const selectedId=window._aruDashboardSelectedActivity&&dashboardActivities.some(a=>a.id===window._aruDashboardSelectedActivity)?window._aruDashboardSelectedActivity:(sorted[0]?.id||'');
+  window._aruDashboardSelectedActivity=selectedId;
+  const one=selectedId?dashboardActivityStats(selectedId):{arr:[],capacity:0,registered:0,available:0,present:0,late:0,leave:0,absent:0,checked:0};
+  const selected=dashboardActivities.find(a=>a.id===selectedId);
+  const openNow=dashboardActivities.filter(a=>{const n=new Date();return n>=new Date(a.registration_open)&&n<=new Date(a.registration_close)}).length;
+
+  $('#content').innerHTML=`<div class="max-w-[1500px] mx-auto space-y-5">
+    <section class="rounded-3xl bg-gradient-to-r from-slate-900 to-blue-900 text-white p-6 md:p-8 shadow-sm">
+      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
+        <div><p class="text-blue-200 text-xs font-semibold tracking-[.16em]">ACTIVITY ARU ANALYTICS</p><h2 class="text-2xl md:text-3xl font-semibold mt-2">ภาพรวมระบบกิจกรรมนักศึกษา</h2><p class="text-slate-300 text-sm mt-2">สรุปการเปิดรับ การลงทะเบียน และผลการเข้าร่วมกิจกรรม เพื่อใช้ติดตามการดำเนินงาน</p></div>
+        <div class="grid grid-cols-3 gap-2 min-w-[320px]"><div class="bg-white/10 rounded-2xl p-3"><p class="text-xs text-slate-300">กิจกรรม</p><p class="text-xl font-semibold">${dashboardActivities.length}</p></div><div class="bg-white/10 rounded-2xl p-3"><p class="text-xs text-slate-300">กำลังเปิดรับ</p><p class="text-xl font-semibold">${openNow}</p></div><div class="bg-white/10 rounded-2xl p-3"><p class="text-xs text-slate-300">ลงทะเบียน</p><p class="text-xl font-semibold">${allStats.registered.toLocaleString()}</p></div></div>
+      </div>
+    </section>
+
+    ${dashboardSectionRegistration(allStats,'all','1. สัดส่วนการเปิดรับและการลงทะเบียนทั้งหมด','รวมข้อมูลทุกกิจกรรมในระบบ')}
+
+    <section class="card p-5 md:p-6">
+      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-5">
+        <div><p class="text-xs font-semibold tracking-wide text-blue-600">ACTIVITY DETAIL</p><h3 class="text-lg font-semibold">2. สัดส่วนการเปิดรับและการลงทะเบียนรายกิจกรรม</h3><p class="text-sm text-slate-500 mt-1">เลือกกิจกรรมเพื่อดูข้อมูลเฉพาะกิจกรรม</p></div>
+        <div class="w-full lg:w-[430px]"><label class="text-xs text-slate-500">เลือกกิจกรรม</label><select id="dashboardActivitySelect" class="input mt-1" onchange="changeDashboardActivity(this.value)">${sorted.map(a=>`<option value="${a.id}" ${a.id===selectedId?'selected':''}>${esc(a.activity_code)} · ${esc(a.title)}</option>`).join('')}</select></div>
+      </div>
+      ${selected?`<div class="rounded-2xl border border-blue-100 bg-blue-50/60 p-4 mb-4"><div class="font-semibold text-blue-950">${esc(selected.title)}</div><div class="text-xs text-blue-700 mt-1">${esc(selected.activity_code)} · ${fmtDate(selected.activity_date)} · ${String(selected.start_time||'').slice(0,5)} น.</div></div>`:''}
+      <div class="grid sm:grid-cols-3 gap-3">${dashboardMetric('จำนวนที่เปิดรับ',one.capacity,'คน','blue')}${dashboardMetric('ลงทะเบียนแล้ว',one.registered,`${dashboardPct(one.registered,one.capacity).toFixed(1)}% ของจำนวนเปิดรับ`,'emerald')}${dashboardMetric('ที่นั่งคงเหลือ',one.available,'คน','slate')}</div>
+      <div class="mt-5 h-64"><canvas id="oneRegChart"></canvas></div>
+    </section>
+
+    ${dashboardSectionAttendance(allStats,'all','3. สัดส่วนการเข้าร่วมกิจกรรมทั้งหมด','รวมสถานะการเช็กชื่อจากทุกกิจกรรม')}
+
+    ${dashboardSectionAttendance(one,'one','4. สัดส่วนการเข้าร่วมกิจกรรมรายกิจกรรม',selected?`${esc(selected.activity_code)} · ${esc(selected.title)}`:'ยังไม่มีกิจกรรมให้เลือก')}
+  </div>`;
+
+  setTimeout(()=>{
+    dashboardChart('allRegChart','doughnut',['ลงทะเบียนแล้ว','ที่นั่งคงเหลือ'],[allStats.registered,allStats.available]);
+    dashboardChart('oneRegChart','doughnut',['ลงทะเบียนแล้ว','ที่นั่งคงเหลือ'],[one.registered,one.available]);
+    dashboardChart('allAttChart','doughnut',['มา','สาย','ลา','ไม่มา'],[allStats.present,allStats.late,allStats.leave,allStats.absent]);
+    dashboardChart('allAttBar','bar',['เปิดรับ','ลงทะเบียน','มา','สาย','ลา','ไม่มา'],[allStats.capacity,allStats.registered,allStats.present,allStats.late,allStats.leave,allStats.absent]);
+    dashboardChart('oneAttChart','doughnut',['มา','สาย','ลา','ไม่มา'],[one.present,one.late,one.leave,one.absent]);
+    dashboardChart('oneAttBar','bar',['เปิดรับ','ลงทะเบียน','มา','สาย','ลา','ไม่มา'],[one.capacity,one.registered,one.present,one.late,one.leave,one.absent]);
+    refreshIcons();
+  },0);
+}
+function changeDashboardActivity(id){window._aruDashboardSelectedActivity=id;renderDashboard()}
 
 function activityStartDate(a){
   if(!a?.activity_date||!a?.start_time)return null;
@@ -498,13 +642,162 @@ function cancellationState(a){
   };
 }
 
-function activityCard(a){let n=regCount(a.id),full=n>=a.capacity,registered=!isAdmin()&&myReg(a.id),eligible=isAdmin()||eligibility(a,studentSelf());let now=new Date(),open=now>=new Date(a.registration_open)&&now<=new Date(a.registration_close);return `<article class="card v3-event overflow-hidden"><div class="aspect-[16/7] bg-slate-100 relative">${a.banner_path?`<img src="${esc(a.banner_path)}" class="w-full h-full object-cover" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'w-full h-full grid place-items-center text-slate-400 text-sm',textContent:'ไม่สามารถโหลดภาพกิจกรรมได้'}))">`:`<div class="w-full h-full grid place-items-center text-slate-300">${icon('image','w-10 h-10')}</div>`}<span class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full text-xs">${n}/${a.capacity} คน</span></div><div class="p-4"><div class="flex items-center justify-between gap-2"><div class="text-xs text-blue-700 font-medium">${esc(a.activity_code)}</div><span class="v3-chip">ปีการศึกษา ${esc(a.academic_year||currentAcademicYear())}</span></div><h3 class="font-semibold text-lg mt-1">${esc(a.title)}</h3><p class="text-sm text-slate-500 mt-2">${icon('calendar','w-4 h-4 inline')} ${fmtDate(a.activity_date)} · ${a.start_time.slice(0,5)} น.</p><p class="text-sm text-slate-500 mt-1">${icon('map-pin','w-4 h-4 inline')} ${esc(a.appointment_location||'-')}</p><div class="flex gap-2 mt-4">${isAdmin()?`<button onclick="activityForm('${a.id}')" class="btn btn-soft flex-1">แก้ไข</button><button onclick="deleteActivity('${a.id}')" class="btn bg-slate-100">${icon('trash-2')}</button>`:`${registered?(()=>{let reg=registrations.find(r=>r.activity_id===a.id&&r.student_id===currentStudentId()&&r.registration_status==='registered');let att=reg?attendance.find(x=>x.activity_id===a.id&&x.student_id===currentStudentId()):null;let checked=att&&['present','late','absent'].includes(normalizeAttendanceStatus(att.attendance_status));let cs=cancellationState(a);return `<div class="flex gap-2 flex-1"><button ${checked?'disabled':''} title="${checked?'เช็กชื่อแล้ว ไม่สามารถแก้ไขสิทธิประโยชน์ได้':'แก้ไขสิทธิประโยชน์'}" onclick="${checked?'':`editRegisteredBenefit('${a.id}')`}" class="btn ${checked?'bg-slate-100 text-slate-400 cursor-not-allowed':'bg-blue-50 text-blue-700'} flex-1">แก้ไขสิทธิ์</button><button ${cs.allowed?'':'disabled'} title="${esc(cs.message)}" onclick="${cs.allowed?`cancelReg('${a.id}')`:''}" class="btn ${cs.allowed?'bg-slate-100':'bg-slate-100 text-slate-400 cursor-not-allowed'} flex-1">${cs.allowed?'ยกเลิก':'ยกเลิกไม่ได้'}</button></div>`})():`<button ${(!eligible||!open||full)?'disabled':''} onclick="reserve('${a.id}')" class="btn btn-primary flex-1">${!eligible?'ไม่ตรงเงื่อนไข':full?'เต็ม':!open?'ยังไม่เปิด/ปิดแล้ว':'ลงทะเบียน'}</button>`}`}<button onclick="viewActivity('${a.id}')" class="btn bg-slate-100">${icon('eye')}</button></div></div></article>`}
-async function renderActivities(){$('#content').innerHTML=`<div class="flex flex-wrap gap-3 justify-between mb-4"><div class="relative flex-1 max-w-md"><input id="actSearch" oninput="filterActivities()" class="input pl-10" placeholder="ค้นหากิจกรรม..."><span class="absolute left-3 top-3 text-slate-400">${icon('search','w-5')}</span></div>${isAdmin()?`<select id="actAcademicYear" onchange="filterActivities()" class="input max-w-[190px]"><option value="">ทุกปีการศึกษา</option>${academicYears.map(y=>`<option value="${y.academic_year}" ${Number(y.academic_year)===Number(currentAcademicYear())?'selected':''}>ปีการศึกษา ${y.academic_year}${y.is_active?' (ปัจจุบัน)':''}</option>`).join('')}</select><button onclick="activityForm()" class="btn btn-primary flex gap-2 items-center">${icon('plus')} สร้างกิจกรรม</button>`:''}</div><div id="activityGrid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>`;filterActivities()}
-function filterActivities(){let q=($('#actSearch')?.value||'').toLowerCase(),ay=$('#actAcademicYear')?.value||'';let arr=visibleActivitiesForCurrentUser().filter(a=>(!ay||String(a.academic_year||'')===ay)&&(a.title.toLowerCase().includes(q)||a.activity_code.toLowerCase().includes(q)));$('#activityGrid').innerHTML=arr.map(activityCard).join('')||'<div class="card p-8 text-center text-slate-400 md:col-span-2">ไม่มีกิจกรรมที่ตรงตามเงื่อนไขของคุณ</div>';refreshIcons()}
-function viewActivity(id){let a=activities.find(x=>x.id===id);if(!a||(!isAdmin()&&!eligibility(a,studentSelf())))return toast('กิจกรรมนี้ไม่ตรงตามเงื่อนไขของคุณ','err');let bs=benefits.filter(x=>x.activity_id===id).map(x=>x.benefit_type);modal(`<div class="flex justify-between gap-4"><div><div class="text-sm text-blue-700">${esc(a.activity_code)}</div><h3 class="text-xl font-semibold">${esc(a.title)}</h3></div><button onclick="closeModal()">${icon('x')}</button></div><div class="mt-5 space-y-3 text-sm"><p><b>ปีการศึกษา:</b> ${esc(a.academic_year||currentAcademicYear())}</p><p><b>วันที่:</b> ${fmtDate(a.activity_date)} เวลา ${a.start_time.slice(0,5)}${a.end_time?' - '+a.end_time.slice(0,5):''} น.</p><p><b>นัดหมาย:</b> ${a.appointment_time?.slice(0,5)||'-'} น. ${esc(a.appointment_location||'')}</p><p><b>เปิดลงทะเบียน:</b> ${fmtDT(a.registration_open)} ถึง ${fmtDT(a.registration_close)}</p><p><b>จำนวน:</b> ${regCount(id)}/${a.capacity} คน</p><p><b>สิทธิประโยชน์:</b> ${bs.map(x=>`<span class="inline-block bg-amber-50 text-amber-800 px-2 py-1 rounded-lg mr-1 mb-1">${esc(x)}</span>`).join('')||'-'}</p><div class="bg-slate-50 rounded-xl p-4 whitespace-pre-wrap">${esc(a.description||'ไม่มีรายละเอียด')}</div></div>`)}
+function studentBrowseActivityCard(a){
+  let n=regCount(a.id), now=new Date(), start=activityStartDate(a), past=start&&start<now;
+  return `<article class="card v3-event overflow-hidden">
+    <div class="aspect-[16/7] bg-slate-100 relative">
+      ${a.banner_path?`<img src="${esc(a.banner_path)}" class="w-full h-full object-cover" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'w-full h-full grid place-items-center text-slate-400 text-sm',textContent:'ไม่สามารถโหลดภาพกิจกรรมได้'}))">`:`<div class="w-full h-full grid place-items-center text-slate-300">${icon('image','w-10 h-10')}</div>`}
+      <span class="absolute top-3 right-3 ${past?'bg-slate-700/85 text-white':'bg-white/90 text-slate-700'} px-2.5 py-1 rounded-full text-xs">${past?'จัดแล้ว':'กำลังจะมาถึง'}</span>
+    </div>
+    <div class="p-4">
+      <div class="flex items-center justify-between gap-2"><div class="text-xs text-blue-700 font-medium">${esc(a.activity_code)}</div><span class="v3-chip">ปีการศึกษา ${esc(a.academic_year||currentAcademicYear())}</span></div>
+      <h3 class="font-semibold text-lg mt-1">${esc(a.title)}</h3>
+      <p class="text-sm text-slate-500 mt-2">${icon('calendar','w-4 h-4 inline')} ${fmtDate(a.activity_date)} · ${String(a.start_time||'').slice(0,5)} น.</p>
+      <p class="text-sm text-slate-500 mt-1">${icon('map-pin','w-4 h-4 inline')} ${esc(a.appointment_location||'-')}</p>
+      <div class="mt-4"><button onclick="viewActivity('${a.id}')" class="btn btn-soft w-full">${icon('eye','w-4 inline')} ดูรายละเอียด</button></div>
+    </div>
+  </article>`;
+}
+function activityCard(a){
+  if(session?.role==='student')return studentBrowseActivityCard(a);
+  let n=regCount(a.id),full=n>=a.capacity,registered=!isAdmin()&&myReg(a.id),eligible=isAdmin()||eligibility(a,studentSelf());let now=new Date(),open=now>=new Date(a.registration_open)&&now<=new Date(a.registration_close);
+  return `<article class="card v3-event overflow-hidden"><div class="aspect-[16/7] bg-slate-100 relative">${a.banner_path?`<img src="${esc(a.banner_path)}" class="w-full h-full object-cover" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'w-full h-full grid place-items-center text-slate-400 text-sm',textContent:'ไม่สามารถโหลดภาพกิจกรรมได้'}))">`:`<div class="w-full h-full grid place-items-center text-slate-300">${icon('image','w-10 h-10')}</div>`}<span class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full text-xs">${n}/${a.capacity} คน</span></div><div class="p-4"><div class="flex items-center justify-between gap-2"><div class="text-xs text-blue-700 font-medium">${esc(a.activity_code)}</div><span class="v3-chip">ปีการศึกษา ${esc(a.academic_year||currentAcademicYear())}</span></div><h3 class="font-semibold text-lg mt-1">${esc(a.title)}</h3><p class="text-sm text-slate-500 mt-2">${icon('calendar','w-4 h-4 inline')} ${fmtDate(a.activity_date)} · ${a.start_time.slice(0,5)} น.</p><p class="text-sm text-slate-500 mt-1">${icon('map-pin','w-4 h-4 inline')} ${esc(a.appointment_location||'-')}</p><div class="flex gap-2 mt-4">${isAdmin()?`<button onclick="activityForm('${a.id}')" class="btn btn-soft flex-1">แก้ไข</button><button onclick="deleteActivity('${a.id}')" class="btn bg-slate-100">${icon('trash-2')}</button>`:`<button onclick="viewActivity('${a.id}')" class="btn bg-slate-100 w-full">${icon('eye')} ดูรายละเอียด</button>`}</div></div></article>`;
+}
+async function renderActivities(){
+  if(session?.role==='student'){
+    $('#content').innerHTML=`<div class="max-w-6xl mx-auto">
+      ${studentBanNoticeHTML()}
+      <div class="mb-5"><p class="text-sm text-blue-600 font-medium">ELIGIBLE ACTIVITIES</p><h2 class="text-2xl font-semibold">กิจกรรมสำหรับคุณ</h2><p class="text-sm text-slate-500 mt-1">แสดงกิจกรรมทั้งหมดที่คุณมีสิทธิ์เข้าร่วมตามกลุ่มเป้าหมาย สำหรับดูประกาศและรายละเอียดกิจกรรม</p></div>
+      <div class="relative max-w-md mb-5"><input id="actSearch" oninput="filterActivities()" class="input pl-10" placeholder="ค้นหากิจกรรม..."><span class="absolute left-3 top-3 text-slate-400">${icon('search','w-5')}</span></div>
+      <div id="activityGrid"></div>
+    </div>`;
+  }else{
+    $('#content').innerHTML=`<div class="flex flex-wrap gap-3 justify-between mb-4"><div class="relative flex-1 max-w-md"><input id="actSearch" oninput="filterActivities()" class="input pl-10" placeholder="ค้นหากิจกรรม..."><span class="absolute left-3 top-3 text-slate-400">${icon('search','w-5')}</span></div>${isAdmin()?`<select id="actAcademicYear" onchange="filterActivities()" class="input max-w-[190px]"><option value="">ทุกปีการศึกษา</option>${academicYears.map(y=>`<option value="${y.academic_year}" ${Number(y.academic_year)===Number(currentAcademicYear())?'selected':''}>ปีการศึกษา ${y.academic_year}${y.is_active?' (ปัจจุบัน)':''}</option>`).join('')}</select><button onclick="activityForm()" class="btn btn-primary flex gap-2 items-center">${icon('plus')} สร้างกิจกรรม</button>`:''}</div><div id="activityGrid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>`;
+  }
+  filterActivities();
+}
+function filterActivities(){
+  let q=($('#actSearch')?.value||'').toLowerCase(),ay=$('#actAcademicYear')?.value||'';
+  let arr=visibleActivitiesForCurrentUser().filter(a=>(!ay||String(a.academic_year||'')===ay)&&((a.title||'').toLowerCase().includes(q)||(a.activity_code||'').toLowerCase().includes(q)));
+  if(session?.role==='student'){
+    let now=new Date(),up=arr.filter(a=>(activityStartDate(a)||0)>=now).sort((a,b)=>(activityStartDate(a)||0)-(activityStartDate(b)||0));
+    let past=arr.filter(a=>(activityStartDate(a)||0)<now).sort((a,b)=>(activityStartDate(b)||0)-(activityStartDate(a)||0));
+    $('#activityGrid').innerHTML=`
+      <section><div class="flex items-center justify-between mb-3"><div><h3 class="v3-section-title">กิจกรรมที่กำลังจะมาถึง</h3><p class="text-xs text-slate-500 mt-1">กิจกรรมที่คุณอยู่ในกลุ่มเป้าหมาย</p></div><span class="v3-chip">${up.length} กิจกรรม</span></div>
+      <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${up.length?up.map(studentBrowseActivityCard).join(''):`<div class="v3-empty md:col-span-2 xl:col-span-3">ไม่มีกิจกรรมที่กำลังจะมาถึง</div>`}</div></section>
+      <section class="mt-8"><div class="flex items-center justify-between mb-3"><div><h3 class="v3-section-title">กิจกรรมที่จัดแล้ว</h3><p class="text-xs text-slate-500 mt-1">ประวัติกิจกรรมที่ตรงกับกลุ่มเป้าหมายของคุณ</p></div><span class="v3-chip">${past.length} กิจกรรม</span></div>
+      <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${past.length?past.map(studentBrowseActivityCard).join(''):`<div class="v3-empty md:col-span-2 xl:col-span-3">ยังไม่มีกิจกรรมที่จัดแล้ว</div>`}</div></section>`;
+  }else{
+    $('#activityGrid').innerHTML=arr.map(activityCard).join('')||'<div class="card p-8 text-center text-slate-400 md:col-span-2">ไม่มีกิจกรรมที่ตรงตามเงื่อนไข</div>';
+  }
+  refreshIcons();
+}
+function viewActivity(id){
+  let a=activities.find(x=>x.id===id);
+  if(!a||(!isAdmin()&&!eligibility(a,studentSelf())))return toast('กิจกรรมนี้ไม่ตรงตามเงื่อนไขของคุณ','err');
+  let bs=benefits.filter(x=>x.activity_id===id).map(x=>x.benefit_type);
+  let reg=session?.role==='student'?registrations.find(r=>r.activity_id===id&&r.student_id===currentStudentId()&&r.registration_status==='registered'):null;
+  let now=new Date(),open=new Date(a.registration_open),close=new Date(a.registration_close);
+  let full=regCount(id)>=Number(a.capacity||0);
+  let banned=session?.role==='student'&&(studentBanNotices||[]).some(b=>b.status==='active'&&b.target_activity_id===id);
+  let registerCTA='';
+  if(session?.role==='student'){
+    if(reg){
+      registerCTA=`<div class="mt-5"><button disabled class="btn w-full bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default">${icon('check-circle','w-4 inline')} ลงทะเบียนกิจกรรมนี้แล้ว</button></div>`;
+    }else if(banned){
+      registerCTA=`<div class="mt-5"><button disabled class="btn w-full bg-red-50 text-red-600 border border-red-200 cursor-not-allowed">${icon('shield-alert','w-4 inline')} ถูกระงับสิทธิ์การจองกิจกรรมนี้</button><p class="text-xs text-red-600 mt-2 text-center">เนื่องจากไม่เข้าร่วมกิจกรรมก่อนหน้าและไม่มีการแจ้งลา</p></div>`;
+    }else if(now<open){
+      registerCTA=`<div class="mt-5"><button disabled class="btn w-full bg-slate-100 text-slate-400 cursor-not-allowed">${icon('clock','w-4 inline')} ยังไม่ถึงเวลาเปิดลงทะเบียน</button></div>`;
+    }else if(now>close){
+      registerCTA=`<div class="mt-5"><button disabled class="btn w-full bg-slate-100 text-slate-400 cursor-not-allowed">${icon('lock','w-4 inline')} ปิดรับลงทะเบียนแล้ว</button></div>`;
+    }else if(full){
+      registerCTA=`<div class="mt-5"><button disabled class="btn w-full bg-slate-100 text-slate-400 cursor-not-allowed">${icon('users','w-4 inline')} ผู้ลงทะเบียนครบจำนวนแล้ว</button></div>`;
+    }else{
+      registerCTA=`<div class="mt-5"><button onclick="closeModal();reserve('${id}')" class="btn w-full bg-blue-600 hover:bg-blue-700 text-white">${icon('ticket-check','w-4 inline')} ลงทะเบียนเข้าร่วมกิจกรรม</button></div>`;
+    }
+  }
+  modal(`<div class="flex justify-between gap-4"><div><div class="text-sm text-blue-700">${esc(a.activity_code)}</div><h3 class="text-xl font-semibold">${esc(a.title)}</h3></div><button onclick="closeModal()">${icon('x')}</button></div><div class="mt-5 space-y-3 text-sm"><p><b>ปีการศึกษา:</b> ${esc(a.academic_year||currentAcademicYear())}</p><p><b>วันที่:</b> ${fmtDate(a.activity_date)} เวลา ${a.start_time.slice(0,5)}${a.end_time?' - '+a.end_time.slice(0,5):''} น.</p><p><b>นัดหมาย:</b> ${a.appointment_time?.slice(0,5)||'-'} น. ${esc(a.appointment_location||'')}</p><p><b>เปิดลงทะเบียน:</b> ${fmtDT(a.registration_open)} ถึง ${fmtDT(a.registration_close)}</p><p><b>จำนวน:</b> ${regCount(id)}/${a.capacity} คน</p><p><b>สิทธิประโยชน์:</b> ${bs.map(x=>`<span class="inline-block bg-amber-50 text-amber-800 px-2 py-1 rounded-lg mr-1 mb-1">${esc(x)}</span>`).join('')||'-'}</p><div class="bg-slate-50 rounded-xl p-4 whitespace-pre-wrap">${esc(a.description||'ไม่มีรายละเอียด')}</div></div>${registerCTA}`)
+}
 function activityForm(id){let a=activities.find(x=>x.id===id)||{}, b=benefits.filter(x=>x.activity_id===id).map(x=>x.benefit_type), f=criteria.faculties.filter(x=>x.activity_id===id).map(x=>x.faculty),y=criteria.years.filter(x=>x.activity_id===id).map(x=>x.year_level),t=criteria.types.filter(x=>x.activity_id===id).map(x=>x.student_type),sp=criteria.specific.filter(x=>x.activity_id===id).map(x=>x.student_id);let dt=v=>v?new Date(v).toISOString().slice(0,16):'';modal(`<form id="activityForm" onsubmit="saveActivity(event,'${id||''}')"><div class="flex justify-between"><h3 class="text-xl font-semibold">${id?'แก้ไข':'สร้าง'}กิจกรรม</h3><button type="button" onclick="closeModal()">${icon('x')}</button></div><div class="grid md:grid-cols-2 gap-4 mt-5"><div><label class="label">รหัสกิจกรรม</label><input name="activity_code" class="input" value="${esc(a.activity_code||'')}" required></div><div><label class="label">ชื่อกิจกรรม</label><input name="title" class="input" value="${esc(a.title||'')}" required></div><div><label class="label">ปีการศึกษา</label><select name="academic_year" class="input" required>${academicYears.length?academicYears.map(y=>`<option value="${y.academic_year}" ${Number(y.academic_year)===Number(a.academic_year||currentAcademicYear())?'selected':''}>ปีการศึกษา ${y.academic_year}${y.is_active?' (ปัจจุบัน)':''}</option>`).join(''):`<option value="${currentAcademicYear()}">ปีการศึกษา ${currentAcademicYear()}</option>`}</select></div><div><label class="label">วันที่กิจกรรม</label><input type="date" name="activity_date" class="input" value="${a.activity_date||''}" required></div><div class="grid grid-cols-2 gap-2"><div><label class="label">เริ่ม</label><input type="time" name="start_time" class="input" value="${a.start_time?.slice(0,5)||''}" required></div><div><label class="label">สิ้นสุด</label><input type="time" name="end_time" class="input" value="${a.end_time?.slice(0,5)||''}"></div></div><div><label class="label">เปิดลงทะเบียน</label><input type="datetime-local" name="registration_open" class="input" value="${dt(a.registration_open)}" required></div><div><label class="label">ปิดลงทะเบียน</label><input type="datetime-local" name="registration_close" class="input" value="${dt(a.registration_close)}" required></div><div><label class="label">เวลานัดหมาย</label><input type="time" name="appointment_time" class="input" value="${a.appointment_time?.slice(0,5)||''}"></div><div><label class="label">สถานที่นัดหมาย</label><input name="appointment_location" class="input" value="${esc(a.appointment_location||'')}"></div><div><label class="label">จำนวนที่เปิดรับ</label><input type="number" min="1" name="capacity" class="input" value="${a.capacity||50}" required></div><div><label class="label">รูปแบนเนอร์ (อัปโหลด)</label><input type="file" name="banner" accept="image/*" class="input"></div></div><div class="mt-4"><label class="label">รายละเอียด</label><textarea name="description" class="input" rows="3">${esc(a.description||'')}</textarea></div><div class="mt-4"><label class="label">สิทธิประโยชน์ (อย่างน้อย 1)</label><div class="grid sm:grid-cols-2 gap-2">${benefitOptions.map(x=>`<label class="p-2 bg-slate-50 rounded-lg"><input type="checkbox" name="benefits" value="${x}" ${b.includes(x)?'checked':''}> ${x}</label>`).join('')}</div></div><div class="mt-4"><label class="label">กลุ่มเป้าหมาย</label><select name="target_mode" class="input" onchange="document.getElementById('criteriaBox').classList.toggle('hide',this.value==='specific');document.getElementById('specificBox').classList.toggle('hide',this.value!=='specific')"><option value="criteria" ${a.target_mode!=='specific'?'selected':''}>เลือกตามเงื่อนไข</option><option value="specific" ${a.target_mode==='specific'?'selected':''}>ระบุนักศึกษา</option></select></div><div id="criteriaBox" class="${a.target_mode==='specific'?'hide':''} grid md:grid-cols-2 gap-4 mt-3"><div><label class="label">คณะ (ไม่เลือก = ทุกคณะ)</label>${faculties.map(x=>`<label class="block text-sm"><input type="checkbox" name="faculties" value="${x}" ${f.includes(x)?'checked':''}> ${x}</label>`).join('')}</div><div><label class="label">ชั้นปี (ไม่เลือก = ทุกชั้นปี)</label>${[1,2,3,4].map(x=>`<label class="mr-3 text-sm"><input type="checkbox" name="years" value="${x}" ${y.includes(x)?'checked':''}> ปี ${x}</label>`).join('')}</div><div><label class="label">ประเภท (ไม่เลือก = ทุกประเภท)</label>${['นักศึกษาทั่วไป','นักศึกษาทุนเครือข่าย-คนละครึ่ง','นักศึกษา กยศ.'].map(x=>`<label class="block text-sm"><input type="checkbox" name="types" value="${x}" ${t.includes(x)?'checked':''}> ${x}</label>`).join('')}</div><div><label class="label">สาขาที่ต้องการ</label><select name="majors" class="input"><option value="ทุกสาขา">ทุกสาขา</option>${majors.map(x=>`<option value="${esc(x)}" ${criteria.majors.filter(m=>m.activity_id===id).some(m=>m.major===x)?'selected':''}>${esc(x)}</option>`).join('')}</select><p class="text-[11px] text-slate-500 mt-1">เลือกทุกสาขา หรือเลือกสาขาที่ต้องการ</p></div></div><div id="specificBox" class="${a.target_mode==='specific'?'':'hide'} mt-3"><label class="label">รหัสนักศึกษา (วางหลายรายการได้ คั่นด้วย comma/เว้นบรรทัด)</label><textarea name="specific_codes" class="input" rows="4">${students.filter(s=>sp.includes(s.id)).map(s=>s.student_code).join('\n')}</textarea></div><label class="flex items-center gap-2 mt-4"><input type="checkbox" name="is_visible" ${a.is_visible!==false?'checked':''}> แสดงกิจกรรมให้นักศึกษาเห็น</label><div class="flex gap-3 mt-6"><button type="button" onclick="closeModal()" class="btn bg-slate-100 flex-1">ยกเลิก</button><button class="btn btn-primary flex-1">บันทึก</button></div></form>`)}
 async function compressImage(file){return new Promise((res,rej)=>{let img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{let max=1600,scale=Math.min(1,max/img.width),c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);c.toBlob(b=>{URL.revokeObjectURL(url);b?res(b):rej(new Error('บีบอัดภาพไม่สำเร็จ'))},'image/webp',.72)};img.onerror=()=>rej(new Error('อ่านไฟล์ภาพไม่สำเร็จ'));img.src=url})}
-async function saveActivity(e,id){e.preventDefault();let f=new FormData(e.target),bs=f.getAll('benefits');if(!bs.length)return toast('กรุณาเลือกสิทธิประโยชน์อย่างน้อย 1 รายการ','err');loading(true,'กำลังบันทึกกิจกรรม...');try{let old=activities.find(x=>x.id===id),banner=old?.banner_path||null,file=f.get('banner');if(file?.size){let blob=await compressImage(file),path=`${Date.now()}-${crypto.randomUUID()}.webp`;await safe(dbClient.storage.from('activity-banners').upload(path,blob,{contentType:'image/webp'}));banner=dbClient.storage.from('activity-banners').getPublicUrl(path).data.publicUrl}let payload={activity_code:f.get('activity_code').trim(),title:f.get('title').trim(),academic_year:Number(f.get('academic_year')||currentAcademicYear()),activity_date:f.get('activity_date'),start_time:f.get('start_time'),end_time:f.get('end_time')||null,registration_open:new Date(f.get('registration_open')).toISOString(),registration_close:new Date(f.get('registration_close')).toISOString(),appointment_time:f.get('appointment_time')||null,appointment_location:f.get('appointment_location'),banner_path:banner,description:f.get('description'),capacity:+f.get('capacity'),is_visible:f.has('is_visible'),target_mode:f.get('target_mode'),created_by:old?.created_by||session.id};let a=id?await safe(dbClient.from('activities').update(payload).eq('id',id).select().single()):await safe(dbClient.from('activities').insert(payload).select().single());let aid=a.id;for(let table of ['activity_benefits','activity_faculties','activity_majors','activity_student_types','activity_years','activity_specific_students'])await safe(dbClient.from(table).delete().eq('activity_id',aid));await safe(dbClient.from('activity_benefits').insert(bs.map(x=>({activity_id:aid,benefit_type:x}))));if(payload.target_mode==='criteria'){let fs=f.getAll('faculties'),ys=f.getAll('years'),ts=f.getAll('types'),ms=[f.get('majors')||'ทุกสาขา'];if(fs.length)await safe(dbClient.from('activity_faculties').insert(fs.map(x=>({activity_id:aid,faculty:x}))));if(ys.length)await safe(dbClient.from('activity_years').insert(ys.map(x=>({activity_id:aid,year_level:String(x)}))));if(ts.length)await safe(dbClient.from('activity_student_types').insert(ts.map(x=>({activity_id:aid,student_type:x}))));if(ms.length)await safe(dbClient.from('activity_majors').insert(ms.map(x=>({activity_id:aid,major:x}))));}else{let codes=(f.get('specific_codes')||'').split(/[\s,;]+/).filter(Boolean),ids=students.filter(s=>codes.includes(s.student_code)).map(s=>s.id);if(ids.length)await safe(dbClient.from('activity_specific_students').insert(ids.map(x=>({activity_id:aid,student_id:x}))));}closeModal();await loadAll();renderActivities();toast('บันทึกกิจกรรมแล้ว')}catch(err){toast(err.message,'err')}finally{loading(false)}}
+function activitySaveErrorMessage(err,activityCode=''){
+  let msg=String(err?.message||err||'');
+  let details=String(err?.details||'');
+  let hint=String(err?.hint||'');
+  let all=[msg,details,hint].join(' ');
+  if(all.includes('activities_activity_code_key')||all.includes('duplicate key value')){
+    return `รหัสกิจกรรม ${activityCode||''} ถูกใช้แล้ว กรุณาใช้รหัสกิจกรรมอื่น`;
+  }
+  if(all.includes('activity_benefits')||all.includes('benefit_type')){
+    return 'บันทึกกิจกรรมแล้ว แต่บันทึกสิทธิประโยชน์ไม่สำเร็จ กรุณาลองบันทึกอีกครั้ง';
+  }
+  return msg||'เกิดข้อผิดพลาดในการบันทึกกิจกรรม';
+}
+
+async function saveActivity(e,id){
+  e.preventDefault();
+  let f=new FormData(e.target),bs=f.getAll('benefits');
+  if(!bs.length)return toast('กรุณาเลือกสิทธิประโยชน์อย่างน้อย 1 รายการ','err');
+
+  let activityCode=(f.get('activity_code')||'').trim();
+  if(!activityCode)return toast('กรุณาระบุรหัสกิจกรรม','err');
+
+  // ตรวจรหัสซ้ำก่อนบันทึก เพื่อไม่ให้ Supabase แสดง duplicate key แบบเทคนิค
+  try{
+    let q=dbClient.from('activities').select('id,activity_code,title').ilike('activity_code',activityCode);
+    if(id)q=q.neq('id',id);
+    let duplicates=await safe(q.limit(1));
+    if(duplicates?.length){
+      return toast(`รหัสกิจกรรม ${activityCode} ถูกใช้แล้ว กรุณาใช้รหัสกิจกรรมอื่น`,'err');
+    }
+  }catch(err){
+    return toast('ไม่สามารถตรวจสอบรหัสกิจกรรมได้: '+err.message,'err');
+  }
+
+  loading(true,'กำลังบันทึกกิจกรรม...');
+  try{
+    let old=activities.find(x=>x.id===id),banner=old?.banner_path||null,file=f.get('banner');
+    if(file?.size){
+      let blob=await compressImage(file),path=`${Date.now()}-${crypto.randomUUID()}.webp`;
+      await safe(dbClient.storage.from('activity-banners').upload(path,blob,{contentType:'image/webp'}));
+      banner=dbClient.storage.from('activity-banners').getPublicUrl(path).data.publicUrl
+    }
+    let payload={
+      activity_code:activityCode,title:f.get('title').trim(),
+      academic_year:Number(f.get('academic_year')||currentAcademicYear()),
+      activity_date:f.get('activity_date'),start_time:f.get('start_time'),
+      end_time:f.get('end_time')||null,
+      registration_open:new Date(f.get('registration_open')).toISOString(),
+      registration_close:new Date(f.get('registration_close')).toISOString(),
+      appointment_time:f.get('appointment_time')||null,
+      appointment_location:f.get('appointment_location'),banner_path:banner,
+      description:f.get('description'),capacity:+f.get('capacity'),
+      is_visible:f.has('is_visible'),target_mode:f.get('target_mode'),
+      created_by:old?.created_by||session.id
+    };
+    let a=id
+      ?await safe(dbClient.from('activities').update(payload).eq('id',id).select().single())
+      :await safe(dbClient.from('activities').insert(payload).select().single());
+    let aid=a.id;
+    for(let table of ['activity_benefits','activity_faculties','activity_majors','activity_student_types','activity_years','activity_specific_students'])
+      await safe(dbClient.from(table).delete().eq('activity_id',aid));
+    await safe(dbClient.from('activity_benefits').upsert([...new Set(bs)].map(x=>({activity_id:aid,benefit_type:x})),{onConflict:'activity_id,benefit_type',ignoreDuplicates:true}));
+    if(payload.target_mode==='criteria'){
+      let fs=f.getAll('faculties'),ys=f.getAll('years'),ts=f.getAll('types'),ms=[f.get('majors')||'ทุกสาขา'];
+      if(fs.length)await safe(dbClient.from('activity_faculties').insert(fs.map(x=>({activity_id:aid,faculty:x}))));
+      if(ys.length)await safe(dbClient.from('activity_years').insert(ys.map(x=>({activity_id:aid,year_level:String(x)}))));
+      if(ts.length)await safe(dbClient.from('activity_student_types').insert(ts.map(x=>({activity_id:aid,student_type:x}))));
+      if(ms.length)await safe(dbClient.from('activity_majors').insert(ms.map(x=>({activity_id:aid,major:x}))));
+    }else{
+      let codes=(f.get('specific_codes')||'').split(/[\s,;]+/).filter(Boolean),
+          ids=students.filter(s=>codes.includes(s.student_code)).map(s=>s.id);
+      if(ids.length)await safe(dbClient.from('activity_specific_students').insert(ids.map(x=>({activity_id:aid,student_id:x}))));
+    }
+    closeModal();await loadAll();renderActivities();toast(id?'แก้ไขกิจกรรมแล้ว':'สร้างกิจกรรมแล้ว');
+  }catch(err){
+    toast(activitySaveErrorMessage(err,activityCode),'err');
+  }finally{loading(false)}
+}
 async function deleteActivity(id){let a=activities.find(x=>x.id===id);let ok=await confirmDialog({title:'ยืนยันการลบกิจกรรม',message:`ต้องการลบ ${a?.title||'กิจกรรมนี้'} หรือไม่? ข้อมูลการลงทะเบียนและการเช็กชื่อที่เกี่ยวข้องจะถูกลบด้วย`,confirmText:'ลบกิจกรรม',danger:true});if(!ok)return;loading(true,'กำลังลบกิจกรรม...');try{await safe(dbClient.from('activities').delete().eq('id',id));await loadAll();renderActivities();toast('ลบกิจกรรมแล้ว')}catch(e){toast(e.message,'err')}finally{loading(false)}}
 function reserve(id){
   let a=activities.find(x=>x.id===id); if(!a)return;
@@ -531,11 +824,11 @@ async function submitReservation(e,id){
   loading(true,'กำลังลงทะเบียน...');
   try{
     await safe(dbClient.rpc('register_activity',{p_activity_id:id,p_student_id:currentStudentId(),p_registered_by:session.id,p_selected_benefit:selectedBenefit,p_admin_override:false}));
-    closeModal(); await loadAll(); renderActivities(); toast('ลงทะเบียนสำเร็จ');
+    closeModal(); await loadAll(); renderMyActivities(); toast('ลงทะเบียนสำเร็จ');
   }catch(e){toast(e.message,'err')}finally{loading(false)}
 }
 
-function editRegisteredBenefit(id){
+function editRegisteredBenefit(id,returnTo='activities'){
   let a=activities.find(x=>x.id===id); if(!a)return;
   let reg=registrations.find(r=>r.activity_id===id&&r.student_id===currentStudentId()&&r.registration_status==='registered');
   if(!reg)return toast('ไม่พบรายการลงทะเบียน','err');
@@ -544,7 +837,7 @@ function editRegisteredBenefit(id){
     return toast('ไม่สามารถแก้ไขสิทธิประโยชน์ได้ เนื่องจากเจ้าหน้าที่เช็กชื่อแล้ว','err');
   }
   let opts=benefits.filter(x=>x.activity_id===id).map(x=>x.benefit_type);
-  modal(`<form onsubmit="saveRegisteredBenefit(event,'${id}')">
+  modal(`<form onsubmit="saveRegisteredBenefit(event,'${id}','${returnTo}')">
     <div class="flex justify-between items-start gap-4">
       <div><h3 class="text-xl font-semibold">แก้ไขสิทธิประโยชน์</h3><p class="text-sm text-slate-600 mt-1">${esc(a.title)}</p></div>
       <button type="button" onclick="closeModal()" class="p-1 text-slate-400">${icon('x')}</button>
@@ -554,17 +847,17 @@ function editRegisteredBenefit(id){
     <div class="flex gap-3 mt-6"><button type="button" onclick="closeModal()" class="btn bg-slate-100 flex-1">ยกเลิก</button><button class="btn btn-primary flex-1">บันทึกการเปลี่ยนแปลง</button></div>
   </form>`);
 }
-async function saveRegisteredBenefit(e,id){
+async function saveRegisteredBenefit(e,id,returnTo='activities'){
   e.preventDefault();
   let selectedBenefit=new FormData(e.target).get('selected_benefit');
   loading(true,'กำลังแก้ไขสิทธิประโยชน์...');
   try{
     await safe(dbClient.rpc('update_registration_benefit',{p_activity_id:id,p_student_id:currentStudentId(),p_selected_benefit:selectedBenefit}));
-    closeModal(); await loadAll(); renderActivities(); toast('แก้ไขสิทธิประโยชน์เรียบร้อยแล้ว');
+    closeModal(); await loadAll(); returnTo==='myactivities'?renderMyActivities():renderActivities(); toast('แก้ไขสิทธิประโยชน์เรียบร้อยแล้ว');
   }catch(e){toast(e.message,'err')}finally{loading(false)}
 }
 
-async function cancelReg(id){
+async function cancelReg(id,returnTo='activities'){
   let a=activities.find(x=>x.id===id),cs=cancellationState(a);
   if(!cs.allowed)return toast(cs.message,'err');
   let ok=await confirmDialog({title:'ยืนยันการยกเลิก',message:`ต้องการยกเลิกการลงทะเบียน “${a?.title||''}” หรือไม่? ${cs.message}`,confirmText:'ยกเลิกการลงทะเบียน',danger:true});
@@ -572,7 +865,7 @@ async function cancelReg(id){
   loading(true,'กำลังยกเลิกการลงทะเบียน...');
   try{
     await safe(dbClient.rpc('cancel_activity_registration',{p_activity_id:id,p_student_id:currentStudentId(),p_admin_override:false}));
-    await loadAll(); renderActivities(); toast('ยกเลิกการลงทะเบียนแล้ว');
+    await loadAll(); returnTo==='myactivities'?renderMyActivities():renderActivities(); toast('ยกเลิกการลงทะเบียนแล้ว');
   }catch(e){toast(e.message,'err')}finally{loading(false)}
 }
 
@@ -850,32 +1143,126 @@ async function fetchStudentsByIds(ids){
 }
 function renderRegistrations(){if(!isAdmin())return renderMyActivities();let opts=activities.map(a=>`<option value="${a.id}">${esc(a.title)}</option>`).join('');$('#content').innerHTML=`<div class="card p-4 mb-4 flex flex-wrap gap-3"><select id="regActivity" onchange="filterRegs()" class="input flex-1 min-w-60"><option value="">ทุกกิจกรรม</option>${opts}</select><select id="regFaculty" onchange="filterRegs()" class="input max-w-xs"><option value="">ทุกคณะ</option>${faculties.map(x=>`<option>${x}</option>`).join('')}</select><button onclick="window.print()" class="btn bg-slate-100">${icon('printer','w-4 inline')} พิมพ์</button></div><div class="card overflow-x-auto print-card"><table class="w-full text-sm"><thead class="bg-slate-50"><tr><th class="p-3 text-left">กิจกรรม</th><th class="p-3 text-left">รหัส</th><th class="p-3 text-left">ชื่อ</th><th class="p-3 text-left">คณะ/สาขา</th><th class="p-3">ชั้นปี</th><th class="p-3 text-left">สิทธิประโยชน์ที่เลือก</th></tr></thead><tbody id="regRows"><tr><td colspan="6" class="p-8 text-center text-slate-400">กำลังโหลด...</td></tr></tbody></table></div>`;filterRegs()}
 async function filterRegs(){let aid=$('#regActivity')?.value||'',fac=$('#regFaculty')?.value||'',rs=registrations.filter(r=>r.registration_status==='registered'&&(!aid||r.activity_id===aid));let ss=await fetchStudentsByIds(rs.map(r=>r.student_id)),map=new Map(ss.map(s=>[s.id,s]));let arr=rs.map(r=>({r,s:map.get(r.student_id),a:activities.find(a=>a.id===r.activity_id)})).filter(x=>x.s&&(!fac||x.s.faculty===fac));$('#regRows').innerHTML=arr.map(x=>`<tr class="border-t"><td class="p-3">${esc(x.a?.title||'-')}</td><td class="p-3">${x.s.student_code}</td><td class="p-3">${esc(x.s.full_name)}</td><td class="p-3">${esc(x.s.faculty)}<br><small>${esc(x.s.major)}</small></td><td class="p-3 text-center">${x.s.year_level}</td><td class="p-3">${esc(x.r.selected_benefit||'-')}</td></tr>`).join('')||`<tr><td colspan="6" class="p-8 text-center text-slate-400">ไม่พบรายการลงทะเบียน</td></tr>`}
+
+function activityEndDate(a){
+  if(!a)return null;
+  let d=activityStartDate(a);if(!d)return null;
+  let end=new Date(d);
+  if(a.end_time){let [h,m]=String(a.end_time).slice(0,5).split(':').map(Number);end.setHours(h||0,m||0,0,0)}
+  return end;
+}
+function attendanceEditable(a){
+  if(session?.role==='admin')return true;
+  let end=activityEndDate(a);if(!end)return false;
+  return new Date()<=new Date(end.getTime()+24*60*60*1000);
+}
+function attendanceEditHint(a){
+  if(session?.role==='admin')return 'Admin สามารถแก้ไขสถานะการเช็กชื่อได้ตลอด';
+  let end=activityEndDate(a);if(!end)return '';
+  let limit=new Date(end.getTime()+24*60*60*1000),now=new Date();
+  if(now<=end)return 'Staff แก้ไขได้ถึง 24 ชั่วโมงหลังสิ้นสุดกิจกรรม';
+  if(now<=limit)return 'กิจกรรมสิ้นสุดแล้ว · Staff ยังแก้ไขได้ภายใน 24 ชั่วโมง';
+  return 'Staff พ้นระยะเวลาแก้ไข 24 ชั่วโมงหลังสิ้นสุดกิจกรรมแล้ว';
+}
+
 function renderAttendance(){if(!isAdmin())return;$('#content').innerHTML=`<div class="card p-4 mb-4"><label class="label">เลือกกิจกรรม</label><select id="attActivity" onchange="attList()" class="input"><option value="">-- เลือกกิจกรรม --</option>${activities.map(a=>`<option value="${a.id}">${esc(a.title)}</option>`).join('')}</select></div><div id="attArea"></div>`}
-async function attList(){let id=$('#attActivity')?.value;if(!id)return $('#attArea').innerHTML='';$('#attArea').innerHTML=`<div class="card p-8 text-center text-slate-400">กำลังโหลดรายชื่อ...</div>`;let rs=registrations.filter(r=>r.activity_id===id&&r.registration_status==='registered'),ss=await fetchStudentsByIds(rs.map(r=>r.student_id)),map=new Map(ss.map(s=>[s.id,s]));$('#attArea').innerHTML=`<div class="card overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50"><tr><th class="p-3 text-left">นักศึกษา</th><th class="p-3 text-left">คณะ / สาขา</th><th class="p-3">สถานะ</th></tr></thead><tbody>${rs.map(r=>{let st=map.get(r.student_id),at=attendance.find(x=>x.activity_id===id&&x.student_id===r.student_id),cur=normalizeAttendanceStatus(at?.attendance_status);return `<tr class="border-t"><td class="p-3"><b>${esc(st?.student_code||'-')}</b><br><span>${esc(st?.full_name||'ไม่พบข้อมูลนักศึกษา')}</span></td><td class="p-3">${esc(st?.faculty||'-')}<br><small class="text-slate-500">${esc(st?.major||'-')}</small></td><td class="p-3"><div class="flex justify-center gap-1">${[['present','มา'],['late','สาย'],['absent','ไม่มา']].map(([val,lab])=>`<button onclick="setAttendance('${id}','${r.student_id}','${val}')" class="btn text-xs ${cur===val?(val==='present'?'bg-emerald-600 text-white':val==='late'?'bg-amber-500 text-white':'bg-red-600 text-white'):'bg-slate-100'}">${lab}</button>`).join('')}</div></td></tr>`}).join('')||`<tr><td colspan="3" class="p-8 text-center text-slate-400">ยังไม่มีผู้ลงทะเบียน</td></tr>`}</tbody></table></div>`;refreshIcons()}
-async function setAttendance(aid,sid,status){try{await safe(dbClient.from('activity_attendance').upsert({activity_id:aid,student_id:sid,attendance_status:status,checked_at:new Date().toISOString(),checked_by:session.id},{onConflict:'activity_id,student_id'}));attendance=await safe(dbClient.from('activity_attendance').select('*'));await attList();toast('บันทึกสถานะแล้ว')}catch(e){toast(e.message,'err')}}
-function renderReports(){
-  if(!isAdmin())return;
-  $('#content').innerHTML=`<div class="card p-4 mb-4">
-    <div class="grid md:grid-cols-[1fr_auto] gap-3 items-end">
-      <div><label class="label">เลือกกิจกรรม</label><select id="reportActivity" onchange="reportActivityDetail()" class="input"><option value="">-- เลือกกิจกรรม --</option>${activities.map(a=>`<option value="${a.id}">${esc(a.activity_code)} - ${esc(a.title)}</option>`).join('')}</select></div>
-      <button id="reportDownloadBtn" onclick="downloadActivityReportCSV()" class="btn btn-primary md:min-w-44" disabled>${icon('download','w-4 h-4 inline')} ดาวน์โหลด CSV</button>
-    </div>
-  </div><div id="reportArea"><div class="card p-8 text-center text-slate-400">กรุณาเลือกกิจกรรมเพื่อดูรายงานรายชื่อนักศึกษา</div></div>`;
-  refreshIcons();
+async function attList(){let id=$('#attActivity')?.value;if(!id)return $('#attArea').innerHTML='';$('#attArea').innerHTML=`<div class="card p-8 text-center text-slate-400">กำลังโหลดรายชื่อ...</div>`;let rs=registrations.filter(r=>r.activity_id===id&&r.registration_status==='registered'),ss=await fetchStudentsByIds(rs.map(r=>r.student_id)),map=new Map(ss.map(s=>[s.id,s]));$('#attArea').innerHTML=`<div class="card overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50"><tr><th class="p-3 text-left">นักศึกษา</th><th class="p-3 text-left">คณะ / สาขา</th><th class="p-3">สถานะ</th></tr></thead><tbody>${rs.map(r=>{let st=map.get(r.student_id),at=attendance.find(x=>x.activity_id===id&&x.student_id===r.student_id),cur=normalizeAttendanceStatus(at?.attendance_status);let editable=attendanceEditable(activities.find(a=>a.id===id));return `<tr class="border-t"><td class="p-3"><b>${esc(st?.student_code||'-')}</b><br><span>${esc(st?.full_name||'ไม่พบข้อมูลนักศึกษา')}</span></td><td class="p-3">${esc(st?.faculty||'-')}<br><small class="text-slate-500">${esc(st?.major||'-')}</small></td><td class="p-3"><div class="flex flex-wrap justify-center gap-1">${[['present','มา'],['late','สาย'],['leave','ลา'],['absent','ไม่มา']].map(([val,lab])=>`<button ${editable?'':'disabled'} onclick="${editable?`setAttendance('${id}','${r.student_id}','${val}')`:''}" class="btn text-xs ${cur===val?(val==='present'?'bg-emerald-600 text-white':val==='late'?'bg-amber-500 text-white':val==='leave'?'bg-violet-600 text-white':'bg-red-600 text-white'):'bg-slate-100'} ${editable?'':'opacity-50 cursor-not-allowed'}">${lab}</button>`).join('')}<button ${editable?'':'disabled'} onclick="${editable?`clearAttendance('${id}','${r.student_id}')`:''}" class="btn text-xs ${!cur?'bg-blue-600 text-white':'bg-white border text-slate-600'} ${editable?'':'opacity-50 cursor-not-allowed'}">ยังไม่เช็ก</button></div><div class="text-[11px] text-slate-400 text-center mt-1">${esc(attendanceEditHint(activities.find(a=>a.id===id)))}</div></td></tr>`}).join('')||`<tr><td colspan="3" class="p-8 text-center text-slate-400">ยังไม่มีผู้ลงทะเบียน</td></tr>`}</tbody></table></div>`;refreshIcons()}
+async function setAttendance(aid,sid,status){
+  let a=activities.find(x=>x.id===aid);
+  if(!attendanceEditable(a))return toast('ไม่สามารถแก้ไขการเช็กชื่อได้ เนื่องจากพ้น 24 ชั่วโมงหลังสิ้นสุดกิจกรรมแล้ว','err');
+  try{
+    await safe(dbClient.rpc('set_attendance',{p_activity_id:aid,p_student_id:sid,p_status:status,p_checked_by:session.id,p_note:null}));
+    attendance=await safe(dbClient.from('activity_attendance').select('*'));
+    await attList();toast('บันทึกสถานะแล้ว');
+  }catch(e){toast(e.message,'err')}
+}
+async function clearAttendance(aid,sid){
+  let a=activities.find(x=>x.id===aid);
+  if(!attendanceEditable(a))return toast('ไม่สามารถแก้ไขการเช็กชื่อได้ เนื่องจากพ้น 24 ชั่วโมงหลังสิ้นสุดกิจกรรมแล้ว','err');
+  try{
+    await safe(dbClient.rpc('clear_attendance',{p_activity_id:aid,p_student_id:sid,p_cleared_by:session.id}));
+    attendance=await safe(dbClient.from('activity_attendance').select('*'));
+    await attList();toast('เปลี่ยนเป็น “ยังไม่เช็กชื่อ” แล้ว');
+  }catch(e){toast(e.message,'err')}
+}
+function reportStatusLabel(raw){
+  const st=normalizeAttendanceStatus(raw);
+  return st==='present'?'มา':st==='late'?'สาย':st==='leave'?'ลา':st==='absent'?'ไม่มา':'ยังไม่เช็กชื่อ';
 }
 function reportRowsForActivity(id){
   return registrations.filter(r=>r.activity_id===id&&r.registration_status==='registered').map(r=>{
-    let s=students.find(x=>x.id===r.student_id),at=attendance.find(x=>x.activity_id===id&&x.student_id===r.student_id);
-    return {r,s,status:at?.attendance_status||'ยังไม่เช็กชื่อ',checked_at:at?.checked_at||''};
-  }).filter(x=>x.s).sort((a,b)=>String(a.s.student_code).localeCompare(String(b.s.student_code),'th'));
+    let st=students.find(x=>x.id===r.student_id),at=attendance.find(x=>x.activity_id===id&&x.student_id===r.student_id);
+    return {r,s:st,status:reportStatusLabel(at?.attendance_status),checked_at:at?.checked_at||''};
+  }).filter(x=>x.s).sort((a,b)=>String(a.s.student_code||'').localeCompare(String(b.s.student_code||''),'th'));
 }
-function reportActivityDetail(){
-  let id=$('#reportActivity').value,area=$('#reportArea'),btn=$('#reportDownloadBtn');
-  if(!id){btn.disabled=true;area.innerHTML='<div class="card p-8 text-center text-slate-400">กรุณาเลือกกิจกรรมเพื่อดูรายงานรายชื่อนักศึกษา</div>';return}
-  btn.disabled=false;
-  let a=activities.find(x=>x.id===id),rows=reportRowsForActivity(id),came=rows.filter(x=>x.status==='มา').length,late=rows.filter(x=>x.status==='สาย').length,absent=rows.filter(x=>x.status==='ไม่มา').length,pending=rows.filter(x=>x.status==='ยังไม่เช็กชื่อ').length;
-  area.innerHTML=`<div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-4">${statCard('ลงทะเบียน',rows.length,'clipboard-list')}${statCard('มา',came,'check-circle')}${statCard('สาย',late,'clock')}${statCard('ไม่มา',absent,'user-x')}${statCard('ยังไม่เช็กชื่อ',pending,'circle-help')}</div>
-  <div class="card v3-event overflow-hidden"><div class="p-4 border-b"><h3 class="font-semibold">${esc(a?.title||'')}</h3><p class="text-xs text-slate-500 mt-1">${esc(a?.activity_code||'')} · ${a?fmtDate(a.activity_date):''}</p></div><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50"><tr><th class="p-3 text-center">ลำดับ</th><th class="p-3 text-left">รหัสนักศึกษา</th><th class="p-3 text-left">ชื่อ - สกุล</th><th class="p-3 text-left">คณะ</th><th class="p-3 text-left">สาขา</th><th class="p-3 text-center">ชั้นปี</th><th class="p-3 text-left">สิทธิประโยชน์ที่เลือก</th><th class="p-3 text-center">สถานะเช็กชื่อ</th><th class="p-3 text-left">เวลาเช็กชื่อ</th></tr></thead><tbody>${rows.length?rows.map((x,i)=>`<tr class="border-t"><td class="p-3 text-center">${i+1}</td><td class="p-3 font-medium">${esc(x.s.student_code)}</td><td class="p-3">${esc(x.s.full_name)}</td><td class="p-3">${esc(x.s.faculty)}</td><td class="p-3">${esc(x.s.major)}</td><td class="p-3 text-center">${x.s.year_level}</td><td class="p-3">${esc(x.r.selected_benefit||'-')}</td><td class="p-3 text-center"><span class="inline-flex rounded-full px-2.5 py-1 text-xs ${x.status==='มา'?'bg-emerald-50 text-emerald-700':x.status==='สาย'?'bg-amber-50 text-amber-700':x.status==='ไม่มา'?'bg-red-50 text-red-700':'bg-slate-100 text-slate-600'}">${x.status}</span></td><td class="p-3">${x.checked_at?new Date(x.checked_at).toLocaleString('th-TH'):'-'}</td></tr>`).join(''):`<tr><td colspan="9" class="p-8 text-center text-slate-400">ยังไม่มีนักศึกษาลงทะเบียนกิจกรรมนี้</td></tr>`}</tbody></table></div></div>`;
+function renderReports(){
+  if(!isAdmin())return;
+  const sorted=[...activities].sort((a,b)=>String(b.activity_date||'').localeCompare(String(a.activity_date||'')));
+  const first=sorted[0]?.id||'';
+  $('#content').innerHTML=`<div class="max-w-[1500px] mx-auto">
+    <div class="card p-4 mb-4">
+      <div class="grid md:grid-cols-[1fr_auto] gap-3 items-end">
+        <div><label class="label">เลือกกิจกรรม</label><select id="reportActivity" onchange="reportActivityDetail()" class="input">${sorted.length?sorted.map((a,i)=>`<option value="${a.id}" ${i===0?'selected':''}>${esc(a.activity_code)} - ${esc(a.title)}</option>`).join(''):'<option value="">ยังไม่มีกิจกรรม</option>'}</select></div>
+        <button id="reportDownloadBtn" onclick="downloadActivityReportCSV()" class="btn btn-primary md:min-w-44" ${first?'':'disabled'}>${icon('download','w-4 h-4 inline')} ดาวน์โหลด CSV</button>
+      </div>
+    </div>
+    <div id="reportArea"></div>
+  </div>`;
+  if(first)reportActivityDetail();else $('#reportArea').innerHTML='<div class="card p-8 text-center text-slate-400">ยังไม่มีกิจกรรมในระบบ</div>';
+  refreshIcons();
+}
+async function reportActivityDetail(){
+  let id=$('#reportActivity')?.value,area=$('#reportArea'),btn=$('#reportDownloadBtn');
+  if(!id){if(btn)btn.disabled=true;area.innerHTML='<div class="card p-8 text-center text-slate-400">กรุณาเลือกกิจกรรม</div>';return}
+  if(btn)btn.disabled=false;
+
+  // โหลดข้อมูลรายงานจากฐานข้อมูลใหม่ทุกครั้ง ป้องกัน state หน้าเว็บไม่ครบ
+  try{
+    const [regRows,attRows]=await Promise.all([
+      safe(dbClient.from('activity_registrations').select('*').eq('activity_id',id).eq('registration_status','registered')),
+      safe(dbClient.from('activity_attendance').select('*').eq('activity_id',id))
+    ]);
+    const studentRows=await fetchStudentsByIds((regRows||[]).map(r=>r.student_id));
+    registrations=registrations.filter(r=>r.activity_id!==id).concat(regRows||[]);
+    attendance=attendance.filter(r=>r.activity_id!==id).concat(attRows||[]);
+    // merge เฉพาะนักศึกษาที่ลงทะเบียนกิจกรรมนี้ ไม่ติดข้อจำกัด 1,000 แถวของ Supabase
+    const ids=new Set((studentRows||[]).map(x=>x.id));
+    students=students.filter(x=>!ids.has(x.id)).concat(studentRows||[]);
+  }catch(e){console.warn('report refresh fallback',e)}
+
+  let a=activities.find(x=>x.id===id),rows=reportRowsForActivity(id);
+  let came=rows.filter(x=>x.status==='มา').length,
+      late=rows.filter(x=>x.status==='สาย').length,
+      leave=rows.filter(x=>x.status==='ลา').length,
+      absent=rows.filter(x=>x.status==='ไม่มา').length,
+      pending=rows.filter(x=>x.status==='ยังไม่เช็กชื่อ').length,
+      capacity=Number(a?.capacity||0),
+      available=Math.max(0,capacity-rows.length);
+
+  area.innerHTML=`
+    <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3 mb-4">
+      ${statCard('เปิดรับ',capacity,'users')}
+      ${statCard('ลงทะเบียน',rows.length,'clipboard-list')}
+      ${statCard('คงเหลือ',available,'user-plus')}
+      ${statCard('มา',came,'check-circle')}
+      ${statCard('สาย',late,'clock')}
+      ${statCard('ลา',leave,'calendar-x')}
+      ${statCard('ไม่มา',absent,'user-x')}
+      ${statCard('ยังไม่เช็กชื่อ',pending,'circle-help')}
+    </div>
+    <div class="card v3-event overflow-hidden">
+      <div class="p-4 border-b flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <div><h3 class="font-semibold">${esc(a?.title||'')}</h3><p class="text-xs text-slate-500 mt-1">${esc(a?.activity_code||'')} · ${a?fmtDate(a.activity_date):''} · เปิดรับ ${capacity.toLocaleString()} คน</p></div>
+        <div class="text-xs text-slate-500">แสดง ${rows.length.toLocaleString()} รายการ</div>
+      </div>
+      <div class="overflow-x-auto"><table class="w-full text-sm">
+        <thead class="bg-slate-50"><tr><th class="p-3 text-center">ลำดับ</th><th class="p-3 text-left">รหัสนักศึกษา</th><th class="p-3 text-left">ชื่อ - สกุล</th><th class="p-3 text-left">คณะ</th><th class="p-3 text-left">สาขา</th><th class="p-3 text-center">ชั้นปี</th><th class="p-3 text-left">สิทธิประโยชน์ที่เลือก</th><th class="p-3 text-center">สถานะเช็กชื่อ</th><th class="p-3 text-left">เวลาเช็กชื่อ</th></tr></thead>
+        <tbody>${rows.length?rows.map((x,i)=>{
+          const cls=x.status==='มา'?'bg-emerald-50 text-emerald-700':x.status==='สาย'?'bg-amber-50 text-amber-700':x.status==='ลา'?'bg-violet-50 text-violet-700':x.status==='ไม่มา'?'bg-red-50 text-red-700':'bg-slate-100 text-slate-600';
+          return `<tr class="border-t"><td class="p-3 text-center">${i+1}</td><td class="p-3 font-medium">${esc(x.s.student_code||'-')}</td><td class="p-3">${esc(x.s.full_name||'-')}</td><td class="p-3">${esc(x.s.faculty||'-')}</td><td class="p-3">${esc(x.s.major||'-')}</td><td class="p-3 text-center">${esc(x.s.year_level||'-')}</td><td class="p-3">${esc(x.r.selected_benefit||'-')}</td><td class="p-3 text-center"><span class="inline-flex rounded-full px-2.5 py-1 text-xs ${cls}">${x.status}</span></td><td class="p-3">${x.checked_at?new Date(x.checked_at).toLocaleString('th-TH'):'-'}</td></tr>`;
+        }).join(''):`<tr><td colspan="9" class="p-10 text-center text-slate-400"><div class="font-medium">ยังไม่มีนักศึกษาลงทะเบียนกิจกรรมนี้</div><div class="text-xs mt-1">หากเพิ่งมีการลงทะเบียน ให้กดเลือกกิจกรรมใหม่เพื่อรีเฟรชข้อมูล</div></td></tr>`}</tbody>
+      </table></div>
+    </div>`;
   refreshIcons();
 }
 function downloadActivityReportCSV(){
@@ -1140,17 +1527,31 @@ async function refreshLoginLogs(){
   try{systemLogs=await loadSystemLogs();renderLoginLogs()}catch(e){toast(e.message,'err')}finally{loading(false)}
 }
 
-function renderRegistrationLogs(){
+async function renderRegistrationLogs(){
   if(!isAdmin())return go('dashboard');
-  const rows=systemLogs.filter(x=>x.action==='activity_register'||x.action==='activity_cancel');
-  const userMap=logUserMap();
-  const studentMap=Object.fromEntries(students.map(x=>[x.id,x]));
-  const activityMap=Object.fromEntries(activities.map(x=>[x.id,x]));
+  let rows=[];
+  try{
+    rows=await safe(dbClient.rpc('get_registration_logs_admin',{p_limit:5000}));
+  }catch(e){
+    console.warn('get_registration_logs_admin fallback:',e);
+    // fallback for databases that have not run the V3.9.8 SQL yet
+    const base=systemLogs.filter(x=>x.action==='activity_register'||x.action==='activity_cancel');
+    const studentMap=Object.fromEntries(students.map(x=>[x.id,x]));
+    const activityMap=Object.fromEntries(activities.map(x=>[x.id,x]));
+    rows=base.map(x=>{
+      const d=x.details||{},st=studentMap[d.student_id]||{},ac=activityMap[d.activity_id]||{};
+      return {id:x.id,created_at:x.created_at,action:x.action,student_id:d.student_id||null,
+        student_code:st.student_code||'',student_name:st.full_name||'',
+        activity_id:d.activity_id||null,activity_code:ac.activity_code||ac.code||'',
+        activity_title:ac.title||'',selected_benefit:d.selected_benefit||''};
+    });
+  }
+
   $('#content').innerHTML=`
     <div class="flex flex-col lg:flex-row lg:items-end gap-3 mb-4">
       <div class="flex-1"><label class="text-xs text-slate-500 font-medium">ค้นหา</label>
         <div class="relative mt-1">${icon('search','w-4 h-4 absolute left-3 top-3.5 text-slate-400')}
-        <input id="regLogSearch" class="input pl-10" placeholder="รหัสนักศึกษา ชื่อนักศึกษา หรือชื่อกิจกรรม"></div>
+        <input id="regLogSearch" class="input pl-10" placeholder="ค้นหาจากรหัสนักศึกษา ชื่อนักศึกษา หรือชื่อกิจกรรม"></div>
       </div>
       <div class="w-full lg:w-60"><label class="text-xs text-slate-500 font-medium">ประเภท</label>
         <select id="regLogType" class="input mt-1"><option value="">ทั้งหมด</option><option value="activity_register">ลงทะเบียน</option><option value="activity_cancel">ยกเลิกลงทะเบียน</option></select>
@@ -1163,29 +1564,31 @@ function renderRegistrationLogs(){
       <span class="px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 text-xs">ยกเลิก <b>${rows.filter(x=>x.action==='activity_cancel').length.toLocaleString()}</b></span>
     </div>
     <div class="card overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-sm">
-      <thead><tr><th class="text-left p-3">วันเวลา</th><th class="text-left p-3">นักศึกษา</th><th class="text-left p-3">กิจกรรม</th><th class="text-left p-3">สิทธิประโยชน์</th><th class="text-left p-3">รายการ</th></tr></thead>
+      <thead><tr><th class="text-left p-3">วันเวลา</th><th class="text-left p-3">รหัสนักศึกษา</th><th class="text-left p-3">นักศึกษา</th><th class="text-left p-3">กิจกรรม</th><th class="text-left p-3">สิทธิประโยชน์</th><th class="text-left p-3">รายการ</th></tr></thead>
       <tbody id="regLogRows"></tbody>
     </table></div></div>`;
+
   const draw=()=>{
     const q=($('#regLogSearch').value||'').toLowerCase().trim(),type=$('#regLogType').value;
     const filtered=rows.filter(x=>{
-      const d=x.details||{}, st=studentMap[d.student_id]||{}, ac=activityMap[d.activity_id]||{}, u=userMap[x.user_id]||{};
-      const txt=[st.student_code,st.full_name,ac.code,ac.title,u.username,u.full_name,d.selected_benefit].join(' ').toLowerCase();
+      const txt=[x.student_code,x.student_name,x.activity_code,x.activity_title,x.selected_benefit].join(' ').toLowerCase();
       return (!type||x.action===type)&&(!q||txt.includes(q));
     });
     $('#regLogRows').innerHTML=filtered.length?filtered.slice(0,1000).map(x=>{
-      const d=x.details||{},st=studentMap[d.student_id]||{},ac=activityMap[d.activity_id]||{};
       const reg=x.action==='activity_register';
       return `<tr class="border-t border-slate-100">
         <td class="p-3 whitespace-nowrap">${new Date(x.created_at).toLocaleString('th-TH')}</td>
-        <td class="p-3"><div class="font-medium">${esc(st.full_name||'-')}</div><div class="text-xs text-slate-400">${esc(st.student_code||'-')}</div></td>
-        <td class="p-3"><div class="font-medium">${esc(ac.title||'-')}</div><div class="text-xs text-slate-400">${esc(ac.code||'')}</div></td>
-        <td class="p-3 text-xs">${esc(d.selected_benefit||'-')}</td>
+        <td class="p-3"><span class="font-semibold text-blue-800">${esc(x.student_code||'-')}</span></td>
+        <td class="p-3"><div class="font-medium">${esc(x.student_name||'-')}</div></td>
+        <td class="p-3"><div class="font-medium">${esc(x.activity_title||'-')}</div><div class="text-xs text-slate-400">${esc(x.activity_code||'')}</div></td>
+        <td class="p-3 text-xs">${esc(x.selected_benefit||'-')}</td>
         <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${reg?'bg-blue-50 text-blue-700':'bg-amber-50 text-amber-700'}">${reg?'ลงทะเบียน':'ยกเลิกลงทะเบียน'}</span></td>
       </tr>`;
-    }).join(''):`<tr><td colspan="5" class="p-10 text-center text-slate-400">ไม่พบข้อมูล Log การลงทะเบียนกิจกรรม</td></tr>`;
+    }).join(''):`<tr><td colspan="6" class="p-10 text-center text-slate-400">ไม่พบข้อมูล Log การลงทะเบียนกิจกรรม</td></tr>`;
   };
-  $('#regLogSearch').oninput=draw;$('#regLogType').onchange=draw;draw();refreshIcons();
+  $('#regLogSearch').oninput=draw;
+  $('#regLogType').onchange=draw;
+  draw();refreshIcons();
 }
 async function refreshRegistrationLogs(){
   loading(true,'กำลังโหลด Log การลงทะเบียน...');
@@ -1198,7 +1601,7 @@ function renderProfile(){
   }
 
   let s=studentSelf();
-  if(s&&session.student_id!==s.id){session.student_id=s.id;sessionStorage.setItem('activity_session',JSON.stringify(session));}
+  if(s&&session.student_id!==s.id){session.student_id=s.id;localStorage.setItem('activity_session',JSON.stringify(session));}
   if(!s){
     $('#content').innerHTML=`<div class="card p-6 max-w-2xl"><h3 class="text-xl font-semibold">ข้อมูลส่วนตัว</h3><p class="text-slate-500 mt-3">Username: ${esc(session.username)}</p><button onclick="passwordModal()" class="btn btn-soft mt-5">เปลี่ยนรหัสผ่าน</button></div>`;refreshIcons();return;
   }
@@ -1230,10 +1633,10 @@ async function saveMyProfile(e){
   try{
     await safe(dbClient.from('students').update(payload).eq('id',s.id));
     await safe(dbClient.from('users').update({full_name:payload.full_name,student_id:s.id}).eq('id',session.id));
-    session.full_name=payload.full_name;sessionStorage.setItem('activity_session',JSON.stringify(session));$('#headerName').textContent=payload.full_name;
+    session.full_name=payload.full_name;localStorage.setItem('activity_session',JSON.stringify(session));$('#headerName').textContent=payload.full_name;
     await loadAll();await syncMyAcademicYear();renderProfile();toast('บันทึกข้อมูลของคุณเรียบร้อยแล้ว');
   }catch(err){toast(err.message,'err')}finally{loading(false)}
 }
 function passwordModal(){modal(`<form onsubmit="changePassword(event)"><h3 class="text-xl font-semibold">เปลี่ยนรหัสผ่าน</h3><label class="label mt-4">รหัสผ่านใหม่</label><input name="password" type="password" minlength="4" class="input" required><div class="flex gap-3 mt-5"><button type="button" onclick="closeModal()" class="btn bg-slate-100 flex-1">ยกเลิก</button><button class="btn btn-primary flex-1">บันทึก</button></div></form>`)} async function changePassword(e){e.preventDefault();try{await safe(dbClient.rpc('set_user_password',{p_user_id:session.id,p_new_password:new FormData(e.target).get('password')}));closeModal();toast('เปลี่ยนรหัสผ่านแล้ว')}catch(e){toast(e.message,'err')}}
-(async()=>{let remembered=localStorage.getItem('remember_username');if(remembered){$('#loginUsername').value=remembered;$('#rememberMe').checked=true}let ss=sessionStorage.getItem('activity_session');if(ss){try{session=JSON.parse(ss);await enterApp()}catch{sessionStorage.removeItem('activity_session')}}refreshIcons()})();
+(async()=>{let remembered=localStorage.getItem('remember_username');if(remembered){$('#loginUsername').value=remembered;$('#rememberMe').checked=true}let ss=localStorage.getItem('activity_session');if(ss){try{session=JSON.parse(ss);await enterApp()}catch{localStorage.removeItem('activity_session')}}refreshIcons()})();
 </script></body></html>
